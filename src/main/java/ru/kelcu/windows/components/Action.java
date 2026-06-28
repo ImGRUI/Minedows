@@ -3,7 +3,7 @@ package ru.kelcu.windows.components;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import ru.kelcu.windows.components.builders.WindowBuilder;
 import ru.kelcuprum.alinlib.gui.components.buttons.Button;
@@ -16,24 +16,24 @@ public class Action {
     @NotNull
     public Component title;
     @NotNull
-    public ResourceLocation icon;
+    public Identifier icon;
     public WindowBuilder windowBuilder;
     public onExecute execute;
 
-    public Action(Type type, Component title, ResourceLocation icon){
+    public Action(Type type, Component title, Identifier icon){
         this(type, title, icon, null, null);
     }
-    public Action(Type type, Component title, ResourceLocation icon, Screen screen){
+    public Action(Type type, Component title, Identifier icon, Screen screen){
         this(type, title, icon, screen, null);
     }
-    public Action(Type type, Component title, ResourceLocation icon, WindowBuilder builder){
+    public Action(Type type, Component title, Identifier icon, WindowBuilder builder){
         this(type, title, icon, null, builder);
     }
-    public Action(onExecute onExecute, Component title, ResourceLocation icon) {
+    public Action(onExecute onExecute, Component title, Identifier icon) {
         this(Type.EXECUTE_ACTION, title, icon, null, null);
         this.execute = onExecute;
     }
-    public Action(Type type, Component title, ResourceLocation icon, Screen screen, WindowBuilder builder){
+    public Action(Type type, Component title, Identifier icon, Screen screen, WindowBuilder builder){
         this.type = type;
         this.screen = screen;
         this.title = title;

@@ -3,7 +3,7 @@ package ru.kelcu.windows.screens.apps;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -303,15 +303,15 @@ public class PaintScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         WindowUtils.welcomeToWhiteSpace(guiGraphics, x, 1, width-x-1, height-62);
         int xm = (int) (i-x);
         int ym = (int) (j-y);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("minedows", String.format("paint-%s", uuid)), x+1, y, 0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getWidth(), bufferedImage.getHeight());
         if(x < i && i < width-1 && y < j && j < y+bufferedImage.getHeight()) {
             if (FabricLoader.getInstance().isDevelopmentEnvironment())
-                guiGraphics.drawString(font, String.format("%sx%s %s", xm, ym, isDragging()), i + 2, j - 9, 0xFF000000, false);
+                guiGraphics.text(font, String.format("%sx%s %s", xm, ym, isDragging()), i + 2, j - 9, 0xFF000000, false);
             guiGraphics.fill(i - (getMarkerSize()-1), j - (getMarkerSize()-1), i + (getMarkerSize()+1), j + (getMarkerSize()+1), 0xFF000000);
         }
         WindowUtils.welcomeToWhiteSpace(guiGraphics, 2, height-58, 40, 40);
@@ -621,10 +621,10 @@ public class PaintScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.enableScissor(44, 0, width, height);
-        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.render(guiGraphics, i, j, f);
+        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.disableScissor();
     }
 
@@ -636,7 +636,7 @@ public class PaintScreen extends Screen {
         }
 
         @Override
-        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
             WindowUtils.welcomeToWhiteSpace(guiGraphics, getX(), getY(), getRight()-getX(), getBottom()-getY());
             guiGraphics.fill(getX()+1, getY()+1, getRight()-1, getBottom()-1, color);
         }

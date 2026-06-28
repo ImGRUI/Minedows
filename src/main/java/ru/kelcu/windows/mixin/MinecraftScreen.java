@@ -1,11 +1,10 @@
 package ru.kelcu.windows.mixin;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.inventory.*;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,24 +18,19 @@ import ru.kelcu.windows.components.Window;
 import ru.kelcu.windows.components.builders.WindowBuilder;
 import ru.kelcu.windows.screens.DesktopScreen;
 import ru.kelcu.windows.utils.WindowUtils;
-import ru.kelcuprum.alinlib.AlinLib;
 
-@Mixin(Minecraft.class)
+@Mixin(Gui.class)
 public abstract class MinecraftScreen{
     @Shadow
     @Nullable
     public Screen screen;
 
     @Shadow
-    @Nullable
-    public ClientLevel level;
-
-    @Shadow
     public abstract void setScreen(@Nullable Screen screen);
 
     @Shadow
     @Final
-    private ItemRenderer itemRenderer;
+    private Minecraft minecraft;
 
     @Inject(method = "setScreen", at=@At("HEAD"), cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci){
@@ -69,7 +63,7 @@ public abstract class MinecraftScreen{
                 if(screen != null){
                     currentWindow = WindowUtils.getBuilderByScreen(screen).build();
                     DesktopScreen.addWindow(currentWindow);
-                } else if(level != null){
+                } else if(minecraft.level != null){
                     return;
                 }
             }
@@ -77,7 +71,7 @@ public abstract class MinecraftScreen{
                 DesktopScreen.removeWindow(currentWindow);
             } else {
                 currentWindow.setScreen(screen);
-                currentWindow.screen.init((Minecraft) (Object) this, (int) currentWindow.width-6, (int) currentWindow.height-22);
+                currentWindow.screen.init((int) currentWindow.width-6, (int) currentWindow.height-22);
             }
             ci.cancel();
         } else if(screen instanceof TitleScreen || (screen instanceof PauseScreen && !Windows.config.getBoolean("ENABLE_PAUSE_SCREEN", false)) || screen instanceof WinScreen || isWindowedDeathScreen(screen) || screen instanceof DisconnectedScreen){
@@ -107,7 +101,7 @@ public abstract class MinecraftScreen{
 
     @Unique
     public boolean isWindowedDeathScreen(Screen screen){
-        if(level == null || !(screen instanceof DeathScreen)) return false;
+        if(minecraft.level == null || !(screen instanceof DeathScreen)) return false;
         return screen instanceof DeathScreen && Windows.config.getBoolean("DEATH", true) &&
                 !(Windows.config.getBoolean("DEATH.HARDCORE", true) && Minecraft.getInstance().level.getLevelData().isHardcore());
     }

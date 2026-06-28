@@ -1,7 +1,7 @@
 package ru.kelcu.windows.mixin.components;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -31,10 +31,10 @@ public class ClientTextTooltipMixin {
     @Final
     private FormattedCharSequence text;
 
-    @Inject(method = "renderText", at=@At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, Font font, int i, int j, CallbackInfo ci){
-        if(AlinLib.MINECRAFT.screen instanceof DesktopScreen) {
-            guiGraphics.drawString(font, text, i, j, Windows.minedowsStyle.getTextColor(TextBuilder.TYPE.BLOCKQUOTE), Windows.minedowsStyle.textShadow(TextBuilder.TYPE.BLOCKQUOTE));
+    @Inject(method = "extractText", at=@At("HEAD"), cancellable = true)
+    public void render(GuiGraphicsExtractor guiGraphics, Font font, int i, int j, CallbackInfo ci){
+        if(AlinLib.MINECRAFT.gui.screen() instanceof DesktopScreen) {
+            guiGraphics.text(font, text, i, j, Windows.minedowsStyle.getTextColor(TextBuilder.TYPE.BLOCKQUOTE), Windows.minedowsStyle.textShadow(TextBuilder.TYPE.BLOCKQUOTE));
             ci.cancel();
         }
     }

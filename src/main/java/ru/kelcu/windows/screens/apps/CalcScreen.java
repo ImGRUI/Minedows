@@ -1,7 +1,7 @@
 package ru.kelcu.windows.screens.apps;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 //#if MC >= 12110
 import net.minecraft.client.input.CharacterEvent;
@@ -65,17 +65,17 @@ public class CalcScreen extends Screen {
     String matematika_blyadskaya = "";
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         WindowUtils.welcomeToWhiteSpace(guiGraphics, 0, 0, width, 30);
         int w = font.width(matematika_blyadskaya);
-        guiGraphics.drawString(font, matematika_blyadskaya, width-5-w, 15-(font.lineHeight/2), 0xFF000000, false);
+        guiGraphics.text(font, matematika_blyadskaya, width-5-w, 15-(font.lineHeight/2), 0xFF000000, false);
     }
 
     boolean isError = false;
     //#if MC >= 12110
     public boolean charTyped( char c, int i) {
-        return charTyped(new CharacterEvent(c, i));
+        return charTyped(new CharacterEvent(i));
     }
     public boolean keyPressed(int i, int j, int k) {
         return keyPressed(new KeyEvent(i, j, k));
@@ -88,7 +88,7 @@ public class CalcScreen extends Screen {
             //#else
             CharacterEvent characterEvent) {
         char c = characterEvent.codepointAsString().charAt(0);
-        int i = characterEvent.modifiers();
+        int i = characterEvent.codepoint();
         //#endif
         if (StringUtil.isAllowedChatCharacter(c) && correctForMath(Character.toString(c))) {
             if(isError) {

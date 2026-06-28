@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class ModMenuActions {
                     if (!mod.getBadges().contains(com.terraformersmc.modmenu.util.mod.Mod.Badge.MINECRAFT)) {
                         if (com.terraformersmc.modmenu.ModMenu.hasConfigScreen(mod.getId())) {
                             try {
-                                ResourceLocation icon = GuiUtils.getResourceLocation("minedows", String.format("mods/%s", mod.getId()));
+                                Identifier icon = GuiUtils.getResourceLocation("minedows", String.format("mods/%s", mod.getId()));
                                 if (!registeredImage.getOrDefault(mod.getId(), false)) {
                                     try {
                                         DynamicTexture texture = mod.getIcon(iconHandler, 64 * Minecraft.getInstance().options.guiScale().get());
@@ -57,6 +57,6 @@ public class ModMenuActions {
         return mods;
     }
 
-    public record ModInfo(String id, String name, Screen screen, ResourceLocation icon, boolean isLibrary){}
+    public record ModInfo(String id, String name, Screen screen, Identifier icon, boolean isLibrary){}
 
 }

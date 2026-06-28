@@ -1,6 +1,6 @@
 package ru.kelcu.windows.mixin.components;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,8 +27,8 @@ public abstract class AbstractWidgetMixin {
     @Shadow
     public abstract int getBottom();
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;containsPointInScissor(II)Z"))
-    public boolean render(GuiGraphics instance, int i, int j) {
+    @Redirect(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;containsPointInScissor(II)Z"))
+    public boolean render(GuiGraphicsExtractor instance, int i, int j) {
         boolean def = instance.containsPointInScissor(i, j);
         if(DesktopScreen.currentRenderedWindow != null){
             Window window = DesktopScreen.currentRenderedWindow;

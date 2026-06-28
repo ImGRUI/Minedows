@@ -1,6 +1,6 @@
 package ru.kelcu.windows.screens.options;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -184,7 +184,7 @@ public class BackgroundSettings extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
         int displayWidth = 160;
         int displayHeight = 90;
         int xDisplay = (width/2)-(displayWidth/2);
@@ -192,7 +192,7 @@ public class BackgroundSettings extends Screen {
         WindowUtils.renderPanel(guiGraphics, xDisplay-10, yDisplay-10, xDisplay+displayWidth+10, yDisplay+displayHeight+10);
         WindowUtils.welcomeToWhiteSpace(guiGraphics, xDisplay-1, yDisplay-1, displayWidth+2, displayHeight+2);
         switch(Windows.config.getNumber("WALLPAPER.TYPE", 0).intValue()){
-            case 1 -> guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("minedows", "perlin"), xDisplay, yDisplay, 0, 0, displayWidth, displayHeight, minecraft.screen.width, minecraft.screen.height);
+            case 1 -> guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("minedows", "perlin"), xDisplay, yDisplay, 0, 0, displayWidth, displayHeight, minecraft.gui.screen().width, minecraft.gui.screen().height);
             case 2 -> {
                 guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("textures/gui/title/background/panorama_0.png"), xDisplay, yDisplay, 0, 35, displayWidth, displayHeight, displayWidth, displayWidth);
 //                renderPanorama(guiGraphics, f);
@@ -220,50 +220,50 @@ public class BackgroundSettings extends Screen {
         }
         int x = 10;
         int y = 150;
-        guiGraphics.drawString(font, Component.translatable("minedows.control.background.wallpaper"), x+10, y, WinColors.getTextColorWithMainColor(), false);
+        guiGraphics.text(font, Component.translatable("minedows.control.background.wallpaper"), x+10, y, WinColors.getTextColorWithMainColor(), false);
         y+=font.lineHeight+5;
         int[] colors = WinColors.getHorizontalRuleColors();
         guiGraphics.
                 //#if MC < 12110
                 //$$renderOutline
                 //#else
-                        submitOutline
+                        outline
                 //#endif
                         (x, y, width-20, height-180, colors[0]);
         guiGraphics.
                 //#if MC < 12110
                 //$$renderOutline
                 //#else
-                        submitOutline
+                        outline
                 //#endif
                         (x+1, y+1, width-22, height-182, colors[0]);
         guiGraphics.
                 //#if MC < 12110
                 //$$renderOutline
                 //#else
-                        submitOutline
+                        outline
                 //#endif
                         (x, y, width-20, height-180, colors[0]);
         guiGraphics.
                 //#if MC < 12110
                 //$$renderOutline
                 //#else
-                        submitOutline
+                        outline
                 //#endif
                         (x, y, width-21, height-181, colors[1]);
         y+=8;
-        guiGraphics.drawString(font, Component.translatable("minedows.control.background.wallpaper.select"), x+10, y, WinColors.getTextColorWithMainColor(), false);
+        guiGraphics.text(font, Component.translatable("minedows.control.background.wallpaper.select"), x+10, y, WinColors.getTextColorWithMainColor(), false);
         y+=font.lineHeight+5;
         WindowUtils.welcomeToWhiteSpace(guiGraphics, x+10, y, x+((width-40)/2), height-y-25);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         int x = 10;
         int y = 169+(font.lineHeight*2);
         guiGraphics.enableScissor(x+10, y, x+((width-40)/2)+15, height-26);
-        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.render(guiGraphics, i, j, f);
+        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.disableScissor();
     }
     @Override

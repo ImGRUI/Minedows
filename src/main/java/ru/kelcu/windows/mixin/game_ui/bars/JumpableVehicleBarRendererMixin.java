@@ -2,8 +2,8 @@ package ru.kelcu.windows.mixin.game_ui.bars;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.contextualbar.JumpableVehicleBarRenderer;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.contextualbar.JumpableVehicleBar;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,17 +16,17 @@ import ru.kelcu.windows.utils.WinColors;
 
 import static ru.kelcuprum.alinlib.gui.Colors.CONVICT;
 
-@Mixin(JumpableVehicleBarRenderer.class)
+@Mixin(JumpableVehicleBar.class)
 public abstract class JumpableVehicleBarRendererMixin {
     @Shadow
     @Final
     private Minecraft minecraft;
 
     @Shadow
-    public abstract void renderBackground(GuiGraphics guiGraphics, DeltaTracker deltaTracker);
+    public abstract void extractBackground(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker);
 
-    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
-    public void renderBackground(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci){
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBackground(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci){
         if(!Windows.config.getBoolean("ENABLE_NEW_UI", false)) return;
         assert this.minecraft.player != null;
         renderBar(guiGraphics, getHotBarX(guiGraphics), getHotBarY(guiGraphics)-7, 186, 5, this.minecraft.player.getJumpRidingScale());
@@ -34,7 +34,7 @@ public abstract class JumpableVehicleBarRendererMixin {
     }
 
     @Unique
-    void renderBar(GuiGraphics guiGraphics, int x, int y, int size, int height, double value){
+    void renderBar(GuiGraphicsExtractor guiGraphics, int x, int y, int size, int height, double value){
         int[] colors = WinColors.getWindowColors();
         // 3
         // 4
@@ -49,11 +49,11 @@ public abstract class JumpableVehicleBarRendererMixin {
     }
 
     @Unique
-    public int getHotBarX(GuiGraphics guiGraphics){
+    public int getHotBarX(GuiGraphicsExtractor guiGraphics){
         return guiGraphics.guiWidth() / 2 - (186 / 2);
     }
     @Unique
-    public int getHotBarY(GuiGraphics guiGraphics){
+    public int getHotBarY(GuiGraphicsExtractor guiGraphics){
         return guiGraphics.guiHeight() - 26;
     }
 }

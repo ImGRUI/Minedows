@@ -1,6 +1,6 @@
 package ru.kelcu.windows.utils;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import ru.kelcu.windows.Windows;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
@@ -20,10 +20,10 @@ public class WinColors {
         return new int[]{theme.startStartMenu(), theme.endStartMenu()};
     }
 
-    public static ResourceLocation getLightIcon(String location){
+    public static Identifier getLightIcon(String location){
         return getLightIcon("windows", location);
     }
-    public static ResourceLocation getLightIcon(String path, String location){
+    public static Identifier getLightIcon(String path, String location){
         ThemeManager.Theme theme = ThemeManager.getSelectedTheme();
         return GuiUtils.getResourceLocation(path, String.format("%s%s.png", location, isLightColor(theme.mainColor()) ? "" : "_l"));
     }

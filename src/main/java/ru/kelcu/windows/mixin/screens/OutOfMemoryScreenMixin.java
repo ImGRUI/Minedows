@@ -1,6 +1,6 @@
 package ru.kelcu.windows.mixin.screens;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.OutOfMemoryScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CommandBlockEditScreen;
@@ -35,7 +35,7 @@ public class OutOfMemoryScreenMixin extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFF0000FF);
         int w = (int) (guiGraphics.guiWidth() * 0.6);
         ArrayList<FormattedCharSequence> messages = new ArrayList<>();
@@ -45,14 +45,14 @@ public class OutOfMemoryScreenMixin extends Screen {
         int x = guiGraphics.guiWidth() / 2 - w / 2;
         int y = guiGraphics.guiHeight() / 2 - h / 2;
         guiGraphics.fill(guiGraphics.guiWidth()/2-(font.width(Component.literal("Minedows"))/2)-6, y-3, guiGraphics.guiWidth()/2+(font.width(Component.literal("Minedows"))/2)+6, y+ font.lineHeight+3, -1);
-        guiGraphics.drawString(font, Component.literal("Minedows"), guiGraphics.guiWidth()/2-(font.width(Component.literal("Minedows"))/2), y, 0xFF0000FF, false);
+        guiGraphics.text(font, Component.literal("Minedows"), guiGraphics.guiWidth()/2-(font.width(Component.literal("Minedows"))/2), y, 0xFF0000FF, false);
         y+=15+font.lineHeight;
         for(FormattedCharSequence formattedCharSequence : messages){
-            guiGraphics.drawString(font, formattedCharSequence, x, y, -1, false);
+            guiGraphics.text(font, formattedCharSequence, x, y, -1, false);
             y+=2+font.lineHeight;
         }
         y+=13;
-        guiGraphics.drawString(font, Component.translatable("minedows.bsod.back", System.currentTimeMillis() % 1000 <= 500 ? "  " : " _"),
+        guiGraphics.text(font, Component.translatable("minedows.bsod.back", System.currentTimeMillis() % 1000 <= 500 ? "  " : " _"),
                 guiGraphics.guiWidth()/2-(font.width(Component.translatable("minedows.bsod.back", ""))/2), y, -1, false);
     }
 
@@ -74,7 +74,7 @@ public class OutOfMemoryScreenMixin extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(new DesktopScreen());
+        minecraft.gui.setScreen(new DesktopScreen());
     }
 
     @Inject(method = "init", at=@At("HEAD"), cancellable = true)

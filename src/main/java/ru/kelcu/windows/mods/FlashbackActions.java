@@ -46,11 +46,11 @@ public class FlashbackActions {
                 //#endif
                                 .hasShiftDown() ? List.of() : Flashback.getReplayIncompatibleMods();
                 if (incompatibleMods.isEmpty()) {
-                    AlinLib.MINECRAFT.setScreen(new SelectReplayScreen(null));
+                    AlinLib.MINECRAFT.gui.setScreen(new SelectReplayScreen(null));
                 } else {
                     String mods = StringUtils.join(incompatibleMods, ", ");
                     Component description = Component.translatable("flashback.incompatible_with_viewing_description").append(Component.literal(mods).withStyle(ChatFormatting.RED));
-                    AlinLib.MINECRAFT.setScreen(new AlertScreen(() -> Minecraft.getInstance().setScreen(null), Component.translatable("flashback.incompatible_with_viewing"), description));
+                    AlinLib.MINECRAFT.gui.setScreen(new AlertScreen(() -> Minecraft.getInstance().gui.setScreen(null), Component.translatable("flashback.incompatible_with_viewing"), description));
                 }
 
             }, Component.translatable("flashback.open_replays"), WinColors.getLightIcon(String.format("textures/start/flashback/start"))));
@@ -80,15 +80,15 @@ public class FlashbackActions {
         if(isRecord())
             Flashback.finishRecordingReplay();
         else Flashback.startRecordingReplay();
-        AlinLib.MINECRAFT.setScreen(null);
+        AlinLib.MINECRAFT.gui.setScreen(null);
     }
     public static void cancelRecord(){
-        AlinLib.MINECRAFT.setScreen(new ConfirmScreen(value -> {
+        AlinLib.MINECRAFT.gui.setScreen(new ConfirmScreen(value -> {
             if (value) {
                 Flashback.cancelRecordingReplay();
-                AlinLib.MINECRAFT.setScreen(null);
+                AlinLib.MINECRAFT.gui.setScreen(null);
             } else {
-                AlinLib.MINECRAFT.setScreen(new PauseScreen(true));
+                AlinLib.MINECRAFT.gui.setScreen(new PauseScreen(true));
             }
         }, Component.literal("Confirm Cancel Recording"),
                 Component.literal("Are you sure you want to cancel the recording? You won't be able to recover it")));

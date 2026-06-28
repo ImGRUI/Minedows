@@ -14,7 +14,7 @@ public class ConfigScreenBuilderMixin {
 
     @Inject(method = "build", at=@At("HEAD"), cancellable = true, remap = false)
     public void build(CallbackInfoReturnable<AbstractConfigScreen> cir){
-        if(!(AlinLib.MINECRAFT.screen instanceof DesktopScreen)) return;
+        if(!(AlinLib.MINECRAFT.gui.screen() instanceof DesktopScreen)) return;
 //        cir.setReturnValue(new AlinLibConfigScreen((ConfigScreenBuilder) (Object) this));
     }
 }

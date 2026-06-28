@@ -1,6 +1,6 @@
 package ru.kelcu.windows.screens.options;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -43,7 +43,7 @@ public class SoundMixerScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
         WindowUtils.welcomeToWhiteSpace(guiGraphics, 0, 0, width, height);
         int y = 10;
         int x = 10;
@@ -72,8 +72,8 @@ public class SoundMixerScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         Component[] components = {
                 Component.translatable("soundCategory.master"),
                 Component.translatable("soundCategory.music"),

@@ -1,6 +1,6 @@
 package ru.kelcu.windows.style;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import ru.kelcu.windows.utils.WinColors;
 import ru.kelcu.windows.utils.WindowUtils;
@@ -16,23 +16,23 @@ public class NothingStyle extends AbstractStyle {
         super("nothing", Component.literal("Nothing, not company"));
     }
     @Override
-    public void renderBackground$widget(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused) {
+    public void renderBackground$widget(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused) {
     }
 
     @Override
-    public void renderBackground$editbox(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused){
+    public void renderBackground$editbox(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused){
         WindowUtils.welcomeToWhiteSpace(guiGraphics, x, y, width, height);
     }
 
     @Override
-    public void renderBackground$slider(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused, double position) {
+    public void renderBackground$slider(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused, double position) {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int x, int y, int width, int height) {
+    public void renderBackground(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height) {
     }
     @Override
-    public void renderTitleBackground(GuiGraphics guiGraphics, int x, int y, int width, int height) {
+    public void renderTitleBackground(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height) {
         int factWidth = width-x;
         int[] colors = Colors.getWinTitleGradientColor();
         for(int i = 0; i<factWidth; i++){
@@ -55,7 +55,7 @@ public class NothingStyle extends AbstractStyle {
     }
 
     @Override
-    public void renderToastBackground(ToastBuilder toastBuilder, GuiGraphics guiGraphics, int x, int y, int width, int height, double timeline) {
+    public void renderToastBackground(ToastBuilder toastBuilder, GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, double timeline) {
         y+=1; height-=1; width-=2;
         guiGraphics.fill(x+1, y+1, x-1+width, y-1+height, 0xFFffffe1);
         guiGraphics.fill(x+1, y+1, x+width+1, y+3, 0xFFffffe1);
@@ -74,7 +74,7 @@ public class NothingStyle extends AbstractStyle {
     }
 
     @Override
-    public void renderBlockquoteBackground(TextBuilder builder, GuiGraphics guiGraphics, int x, int y, int width, int height, int[] colors) {
+    public void renderBlockquoteBackground(TextBuilder builder, GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, int[] colors) {
         width-=2;
         guiGraphics.fill(x+1, y+1, x-1+width, y-1+height, 0xFFffffe1);
         guiGraphics.fill(x+1, y+1, x+width+1, y+3, 0xFFffffe1);
@@ -92,7 +92,7 @@ public class NothingStyle extends AbstractStyle {
         guiGraphics.fill(x+width, y+3, x-1+width, y-2+height, 0xFF000000);
     }
 
-    public void renderTooltip(GuiGraphics guiGraphics, int x, int y, int width, int height){
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height){
         guiGraphics.fill(x+1, y+1, x-1+width, y-1+height, 0xFFffffe1);
         //tochki
         guiGraphics.fill(x+1, y+1, x+2, y+2, 0xFF000000);

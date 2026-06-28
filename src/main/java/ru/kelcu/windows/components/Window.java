@@ -5,7 +5,7 @@ package ru.kelcu.windows.components;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import ru.kelcu.windows.screens.AbstractWindowedScreen;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 
@@ -23,7 +23,7 @@ public class Window {
     public UUID uuid;
     public boolean resizable = true;
     public boolean maximize = false;
-    public ResourceLocation icon;
+    public Identifier icon;
     public Component title;
 
     public boolean isDragging;
@@ -42,7 +42,7 @@ public class Window {
     public Window(UUID uuid, int x, int y, int width, int height, boolean active, int buttons, Screen screen){
         this(uuid, x, y, width, height, null, active, buttons, true, screen, GuiUtils.getResourceLocation("windows", "textures/start/icons/cmd.png"));
     }
-    public Window(UUID uuid, int x, int y, int width, int height, Component title, boolean active, int buttons, boolean visible, Screen screen, ResourceLocation icon){
+    public Window(UUID uuid, int x, int y, int width, int height, Component title, boolean active, int buttons, boolean visible, Screen screen, Identifier icon){
         this.uuid = uuid;
         this.x = x;
         this.y = y;

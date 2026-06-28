@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import ru.kelcuprum.alinlib.AlinLib;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
@@ -27,7 +27,7 @@ public class WallpaperUtil {
     public static final WallpaperData FACTORY_TOWN = new WallpaperData("factory_town", Component.translatable("minedows.wallpaper.factory_town"), GuiUtils.getResourceLocation("windows", "textures/wallpaper/factory_town.png"), 1751, 512);
     public static final WallpaperData ERROR = new WallpaperData("error", Component.translatable("minedows.wallpaper.error"), GuiUtils.getResourceLocation("windows", "textures/wallpaper/error.png"), 1920, 1080);
     public static final WallpaperData FLUFFY = new WallpaperData("fluffy_forever", Component.translatable("minedows.wallpaper.fluffy"), GuiUtils.getResourceLocation("windows", "textures/wallpaper/fluffy.png"), 1280, 834);
-    public static ResourceLocation location = GuiUtils.getResourceLocation("minedows", "wallpaper");
+    public static Identifier location = GuiUtils.getResourceLocation("minedows", "wallpaper");
     public static int width = 0;
     public static int height = 0;
     public static void loadFileWallpaper(Path hellYeah) throws IOException {
@@ -58,7 +58,7 @@ public class WallpaperUtil {
 
     public static void fluffy(){
         loadWallpaper(FLUFFY);
-        AlinLib.MINECRAFT.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CAT_AMBIENT, 1f, 1f));
+        AlinLib.MINECRAFT.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CAT_AMBIENT_BABY.value(), 1f, 1f));
     }
 
     public static HashMap<String, WallpaperData> wallpapers = new HashMap<>();
@@ -77,5 +77,5 @@ public class WallpaperUtil {
     }
 
 
-    public record WallpaperData(String id, Component name, ResourceLocation location, int width, int height){};
+    public record WallpaperData(String id, Component name, Identifier location, int width, int height){};
 }

@@ -1,7 +1,6 @@
 package ru.kelcu.windows.screens.apps;
 
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.ErrorScreen;
@@ -14,6 +13,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 import ru.kelcu.windows.Windows;
 import ru.kelcu.windows.components.Action;
@@ -175,7 +175,7 @@ public class ExplorerScreen extends Screen {
                 if(file.isDirectory()){
                     if(file.listFiles() == null) {
                         Util.getPlatform().openPath(file.toPath());
-                        minecraft.setScreen(null);
+                        minecraft.gui.setScreen(null);
                     } else {
                         ArrayList<File> files = new ArrayList<>();
                         for(File f : file.listFiles()) if(f.isDirectory()) files.add(f);
@@ -205,19 +205,19 @@ public class ExplorerScreen extends Screen {
                     }
                 } else {
                     Util.getPlatform().openFile(file);
-                    minecraft.setScreen(null);
+                    minecraft.gui.setScreen(null);
                 }
-            } else minecraft.setScreen(null);
+            } else minecraft.gui.setScreen(null);
         } catch (Exception ex){
-            minecraft.setScreen(new ErrorScreen(Component.literal("Explorer crashes"), Component.literal(ex.getLocalizedMessage().isBlank() ? ex.getMessage() : ex.getLocalizedMessage())));
+            minecraft.gui.setScreen(new ErrorScreen(Component.literal("Explorer crashes"), Component.literal(ex.getLocalizedMessage().isBlank() ? ex.getMessage() : ex.getLocalizedMessage())));
         }
 
 //        widgets.add(new LabelWidget(-50, 0, 40, new Action(Action.Type.OPEN_SCREEN, Component.translatable("minedows.control.minecraft"), GuiUtils.getResourceLocation("windows", "textures/start/icons/shutdown.png"), new WindowBuilder().setScreen(new OptionsScreen(null, Minecraft.getInstance().options)))));
     }
     public ArrayList<LabelWidget> widgets = new ArrayList<>();
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(guiGraphics, mouseX, mouseY, partialTick);
         WindowUtils.welcomeToWhiteSpace(guiGraphics, 0, yForFolder, width, height-yForFolder);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("windows", "textures/options/background.png"), 1, yForFolder+1, 0, 0, 100, 150, 100, 150);
         int fruik =90;
@@ -226,7 +226,7 @@ public class ExplorerScreen extends Screen {
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("windows", "textures/start/icons/computer_gear.png"), x, y, 0, 0, 35, 35, 35, 35);
         y+=45;
         for(FormattedCharSequence formattedCharSequence : font.split(Component.empty().append(getTitle()).withStyle(Style.EMPTY.withBold(true)), fruik)){
-            guiGraphics.drawString(font, formattedCharSequence, x, y, 0xFF000000, false);
+            guiGraphics.text(font, formattedCharSequence, x, y, 0xFF000000, false);
             y += font.lineHeight + 3;
         }
         y+=5;
@@ -242,7 +242,7 @@ public class ExplorerScreen extends Screen {
         }
         y+=15;
         for(FormattedCharSequence formattedCharSequence : font.split(Component.translatable(widgets.isEmpty() ? "minedows.control.description.empty" : "minedows.control.description"), fruik)){
-            guiGraphics.drawString(font, formattedCharSequence, x, y, 0xFF000000, false);
+            guiGraphics.text(font, formattedCharSequence, x, y, 0xFF000000, false);
             y += font.lineHeight + 3;
         }
     }
@@ -341,10 +341,10 @@ public class ExplorerScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.enableScissor(1, yForFolder+1, width-1, height-1);
-        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.render(guiGraphics, i, j, f);
+        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.disableScissor();
     }
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {

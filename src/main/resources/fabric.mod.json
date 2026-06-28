@@ -24,7 +24,6 @@
   "icon": "assets/windows/icon.png",
   "depends": {
     "fabricloader": "*",
-    "fabric": "*",
     "alinlib": "*",
     "minecraft": "${minecraft_dependency}"
   },

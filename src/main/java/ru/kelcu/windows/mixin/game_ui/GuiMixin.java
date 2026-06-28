@@ -1,15 +1,17 @@
 package ru.kelcu.windows.mixin.game_ui;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.components.spectator.SpectatorGui;
-import net.minecraft.client.gui.contextualbar.ContextualBarRenderer;
-import net.minecraft.client.gui.contextualbar.ExperienceBarRenderer;
-import net.minecraft.client.gui.contextualbar.JumpableVehicleBarRenderer;
+import net.minecraft.client.gui.contextualbar.ContextualBar;
+import net.minecraft.client.gui.contextualbar.ExperienceBar;
+import net.minecraft.client.gui.contextualbar.JumpableVehicleBar;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.effect.MobEffects;
@@ -19,7 +21,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,7 +41,7 @@ import java.util.function.Supplier;
 import static ru.kelcuprum.alinlib.gui.Colors.*;
 import static ru.kelcuprum.alinlib.gui.Colors.GROUPIE;
 
-@Mixin(Gui.class)
+@Mixin(Hud.class)
 public abstract class GuiMixin {
     @Shadow
     @Nullable
@@ -54,25 +55,25 @@ public abstract class GuiMixin {
     private SpectatorGui spectatorGui;
 
     @Shadow
-    protected abstract void renderItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker);
+    protected abstract void extractItemHotbar(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker);
 
     @Shadow
-    protected abstract void renderPlayerHealth(GuiGraphics guiGraphics);
+    protected abstract void extractPlayerHealth(GuiGraphicsExtractor guiGraphics);
 
     @Shadow
-    protected abstract void renderVehicleHealth(GuiGraphics guiGraphics);
+    protected abstract void extractVehicleHealth(GuiGraphicsExtractor guiGraphics);
 
     @Shadow
-    protected abstract Gui.ContextualInfo nextContextualInfoState();
+    protected abstract Hud.ContextualInfo nextContextualInfoState();
 
     @Shadow
-    private Pair<Gui.ContextualInfo, ContextualBarRenderer> contextualInfoBar;
+    private com.mojang.datafixers.util.Pair<Hud.ContextualInfo, ContextualBar> contextualInfoBar;
     @Shadow
     @Final
-    private Map<Gui.ContextualInfo, Supplier<ContextualBarRenderer>> contextualInfoBarRenderers;
+    private Map<Hud.ContextualInfo, Supplier<ContextualBar>> contextualInfoBars;
 
     @Shadow
-    protected abstract void renderSelectedItemName(GuiGraphics guiGraphics);
+    protected abstract void extractSelectedItemName(GuiGraphicsExtractor guiGraphics);
 
     @Shadow
     @Nullable
@@ -83,57 +84,57 @@ public abstract class GuiMixin {
 
     @Unique
     int screenWidth, screenHeight;
-    @Inject(method = "render", at = @At("HEAD"))
-    void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"))
+    void render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         this.screenWidth = guiGraphics.guiWidth();
         this.screenHeight = guiGraphics.guiHeight();
     }
     // HOTBAR
 
-    @Inject(method = "renderHotbarAndDecorations", at = @At("HEAD"), cancellable = true)
-    public void renderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+    @Inject(method = "extractHotbarAndDecorations", at = @At("HEAD"), cancellable = true)
+    public void renderHotbarAndDecorations(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if(!Windows.config.getBoolean("ENABLE_NEW_UI", false)) return;
         if (this.minecraft.gameMode.getPlayerMode() == GameType.SPECTATOR) {
-            this.spectatorGui.renderHotbar(guiGraphics);
+            this.spectatorGui.extractHotbar(guiGraphics);
         } else {
-            this.renderItemHotbar(guiGraphics, deltaTracker);
+            this.extractItemHotbar(guiGraphics, deltaTracker);
         }
 
         if (this.minecraft.gameMode.canHurtPlayer()) {
-            this.renderPlayerHealth(guiGraphics);
+            this.extractPlayerHealth(guiGraphics);
         }
 
-        this.renderVehicleHealth(guiGraphics);
-        Gui.ContextualInfo contextualInfo = this.nextContextualInfoState();
-        Gui.ContextualInfo contextualInfo2 = this.nextContextualInfoStateFucked();
-        if (contextualInfo != this.contextualInfoBar.getKey()) {
-            this.contextualInfoBar = Pair.of(contextualInfo, (ContextualBarRenderer) ((Supplier) this.contextualInfoBarRenderers.get(contextualInfo)).get());
+        this.extractVehicleHealth(guiGraphics);
+        Hud.ContextualInfo contextualInfo = this.nextContextualInfoState();
+        Hud.ContextualInfo contextualInfo2 = this.nextContextualInfoStateFucked();
+        if (contextualInfo != this.contextualInfoBar.getFirst()) {
+            this.contextualInfoBar = Pair.of(contextualInfo, (ContextualBar)((Supplier)this.contextualInfoBars.get(contextualInfo)).get());
         }
-        if (contextualInfoBar.getKey() == Gui.ContextualInfo.LOCATOR) {
-            Pair<Gui.ContextualInfo, ContextualBarRenderer> notContextualInfoBar = Pair.of(contextualInfo, (ContextualBarRenderer) ((Supplier) this.fuckLocatorBar.get(contextualInfo2)).get());
-            notContextualInfoBar.getValue().renderBackground(guiGraphics, deltaTracker);
+        if (contextualInfoBar.getFirst() == Hud.ContextualInfo.LOCATOR) {
+            Pair<Hud.ContextualInfo, ContextualBar> notContextualInfoBar = Pair.of(contextualInfo, (ContextualBar) ((Supplier) this.fuckLocatorBar.get(contextualInfo2)).get());
+            ((ContextualBar)notContextualInfoBar.getSecond()).extractBackground(guiGraphics, deltaTracker);
             if (this.minecraft.gameMode.hasExperience() && this.minecraft.player.experienceLevel > 0) {
                 renderExperienceLevel(guiGraphics, this.minecraft.font, this.minecraft.player.experienceLevel);
             }
 
-            notContextualInfoBar.getValue().render(guiGraphics, deltaTracker);
+            notContextualInfoBar.getSecond().extractRenderState(guiGraphics, deltaTracker);
         }
-        ((ContextualBarRenderer) this.contextualInfoBar.getValue()).renderBackground(guiGraphics, deltaTracker);
+        ((ContextualBar) this.contextualInfoBar.getSecond()).extractBackground(guiGraphics, deltaTracker);
         if (this.minecraft.gameMode.hasExperience() && this.minecraft.player.experienceLevel > 0) {
             renderExperienceLevel(guiGraphics, this.minecraft.font, this.minecraft.player.experienceLevel);
         }
 
-        ((ContextualBarRenderer) this.contextualInfoBar.getValue()).render(guiGraphics, deltaTracker);
+        ((ContextualBar) this.contextualInfoBar.getSecond()).extractBackground(guiGraphics, deltaTracker);
         if (this.minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR) {
-            this.renderSelectedItemName(guiGraphics);
+            this.extractSelectedItemName(guiGraphics);
         } else if (this.minecraft.player.isSpectator()) {
-            this.spectatorGui.renderAction(guiGraphics);
+            this.spectatorGui.extractAction(guiGraphics);
         }
         ci.cancel();
     }
 
-    @Inject(method = "renderItemHotbar", at=@At("HEAD"), cancellable = true)
-    public void renderHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci){
+    @Inject(method = "extractItemHotbar", at=@At("HEAD"), cancellable = true)
+    public void renderHotbar(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci){
         if(!Windows.config.getBoolean("ENABLE_NEW_UI", false)) return;
         int x1 = screenWidth / 2 - (186 / 2);
         int x2 = screenWidth / 2 + (186 / 2);
@@ -160,8 +161,8 @@ public abstract class GuiMixin {
         }
         ci.cancel();
     }
-    @Inject(method = "renderPlayerHealth", at = @At("HEAD"), cancellable = true)
-    void renderPlayrerHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "extractPlayerHealth", at = @At("HEAD"), cancellable = true)
+    void renderPlayrerHealth(GuiGraphicsExtractor guiGraphics, CallbackInfo ci) {
         if(!Windows.config.getBoolean("ENABLE_NEW_UI", false)) return;
         if (this.minecraft.player == null) return;
         double health = this.minecraft.player.getHealth() / this.minecraft.player.getAttributeValue(Attributes.MAX_HEALTH);
@@ -185,8 +186,8 @@ public abstract class GuiMixin {
 
         ci.cancel();
     }
-    @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
-    void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "extractVehicleHealth", at = @At("HEAD"), cancellable = true)
+    void renderVehicleHealth(GuiGraphicsExtractor guiGraphics, CallbackInfo ci) {
         if(!Windows.config.getBoolean("ENABLE_NEW_UI", false)) return;
         assert this.minecraft.gameMode != null;
         assert this.minecraft.player != null;
@@ -211,21 +212,21 @@ public abstract class GuiMixin {
     }
     // Hotbar shit
     @Unique
-    private void renderExperienceLevel(GuiGraphics guiGraphics, Font font, int level){
+    private void renderExperienceLevel(GuiGraphicsExtractor guiGraphics, Font font, int level){
         if(!Windows.config.getBoolean("ENABLE_NEW_UI", false)) return;
         Component component = Component.translatable("gui.experience.level", level);
         int i = (guiGraphics.guiWidth() - font.width(component)) / 2;
         int var10000 = guiGraphics.guiHeight() - 26;
         Objects.requireNonNull(font);
         int j = var10000 - 9 - font.lineHeight;
-        guiGraphics.drawString(font, component, i + 1, j, -16777216, false);
-        guiGraphics.drawString(font, component, i - 1, j, -16777216, false);
-        guiGraphics.drawString(font, component, i, j + 1, -16777216, false);
-        guiGraphics.drawString(font, component, i, j - 1, -16777216, false);
-        guiGraphics.drawString(font, component, i, j, -8323296, false);
+        guiGraphics.text(font, component, i + 1, j, -16777216, false);
+        guiGraphics.text(font, component, i - 1, j, -16777216, false);
+        guiGraphics.text(font, component, i, j + 1, -16777216, false);
+        guiGraphics.text(font, component, i, j - 1, -16777216, false);
+        guiGraphics.text(font, component, i, j, -8323296, false);
     }
     @Unique
-    void renderBar(GuiGraphics guiGraphics, int x, int y, int color, int size, int height, double value){
+    void renderBar(GuiGraphicsExtractor guiGraphics, int x, int y, int color, int size, int height, double value){
         if(!Windows.config.getBoolean("ENABLE_NEW_UI", false)) return;
         int[] colors = WinColors.getWindowColors();
         guiGraphics.fill(x, y, x+size-1, y+height, colors[3]);
@@ -237,19 +238,19 @@ public abstract class GuiMixin {
         }
     }
     @Unique
-    private final Map<Gui.ContextualInfo, Supplier<ContextualBarRenderer>> fuckLocatorBar = ImmutableMap.of(Gui.ContextualInfo.EMPTY, (Supplier) () -> ContextualBarRenderer.EMPTY, Gui.ContextualInfo.EXPERIENCE, (Supplier) () -> new ExperienceBarRenderer(minecraft), Gui.ContextualInfo.JUMPABLE_VEHICLE, (Supplier) () -> new JumpableVehicleBarRenderer(minecraft));
+    private final Map<Hud.ContextualInfo, Supplier<ContextualBar>> fuckLocatorBar = ImmutableMap.of(Hud.ContextualInfo.EMPTY, (Supplier) () -> ContextualBar.EMPTY, Hud.ContextualInfo.EXPERIENCE, (Supplier) () -> new ExperienceBar(minecraft), Hud.ContextualInfo.JUMPABLE_VEHICLE, (Supplier) () -> new JumpableVehicleBar(minecraft));
     @Unique
     public boolean isExperienceBarVisible() {
-        return this.nextContextualInfoStateFucked() != Gui.ContextualInfo.EMPTY;
+        return this.nextContextualInfoStateFucked() != Hud.ContextualInfo.EMPTY;
     }
     @Unique
-    private Gui.ContextualInfo nextContextualInfoStateFucked() {
+    private Hud.ContextualInfo nextContextualInfoStateFucked() {
         boolean bl2 = this.minecraft.player.jumpableVehicle() != null;
         boolean bl3 = this.minecraft.gameMode.hasExperience();
         if (bl2) {
-            return Gui.ContextualInfo.JUMPABLE_VEHICLE;
+            return Hud.ContextualInfo.JUMPABLE_VEHICLE;
         } else {
-            return bl3 ? Gui.ContextualInfo.EXPERIENCE : Gui.ContextualInfo.EMPTY;
+            return bl3 ? Hud.ContextualInfo.EXPERIENCE : Hud.ContextualInfo.EMPTY;
         }
     }
 
@@ -262,7 +263,7 @@ public abstract class GuiMixin {
         return ARGB.color(255, (int) (r*w), (int) (g*w), (int) (b*w));
     }
     @Unique
-    void kelUI$renderSlot(GuiGraphics guiGraphics, int x, int y, DeltaTracker deltaTracker, Player player, ItemStack itemStack, boolean isSelected) {
+    void kelUI$renderSlot(GuiGraphicsExtractor guiGraphics, int x, int y, DeltaTracker deltaTracker, Player player, ItemStack itemStack, boolean isSelected) {
         int[] colors = WinColors.getWindowColors();
         int darkness = getColor(colors[2], 210);
         for(int i = 0; i<20; i++){ // X
@@ -277,7 +278,7 @@ public abstract class GuiMixin {
             //#if MC < 12110
             //$$renderOutline
             //#else
-            submitOutline
+            outline
             //#endif
             (x, y, 20, 20, 0x3e0000F3);
         }
@@ -291,9 +292,9 @@ public abstract class GuiMixin {
                 guiGraphics.pose().translate((float) (-(x + 8)), (float) (-(y + 12)));
             }
 
-            guiGraphics.renderItem(player, itemStack, x + 2, y + 2, 1);
+            guiGraphics.item(player, itemStack, x + 2, y + 2, 1);
             if (g > 0.0F) guiGraphics.pose().popMatrix();
-            guiGraphics.renderItemDecorations(this.minecraft.font, itemStack, x + 2, y + 2);
+            guiGraphics.itemDecorations(this.minecraft.font, itemStack, x + 2, y + 2);
         }
     }
     @Unique

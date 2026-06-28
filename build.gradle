@@ -2,22 +2,20 @@ plugins {
     id 'maven-publish'
     id "com.modrinth.minotaur" version "2.+"
     id "io.github.goooler.shadow" version "8.1.7" apply false
-    id "fabric-loom" version "1.13+" apply false
+    id "net.fabricmc.fabric-loom" version "1.16-SNAPSHOT" apply false
     id "io.github.p03w.machete" version "2.+" apply false
 
     // https://github.com/ReplayMod/preprocessor
     // https://github.com/Fallen-Breath/preprocessor
-    id 'com.replaymod.preprocess' version 'ce1aeb2b'
+    id 'com.replaymod.preprocess' version '4c38783'
 
     // https://github.com/Fallen-Breath/yamlang
-    id 'me.fallenbreath.yamlang' version '1.3.1' apply false
+    id 'me.fallenbreath.yamlang' version '1.5.0' apply false
 }
 
 preprocess {
-    def mc1218_fabric = createNode('1.21.8-fabric', 1_21_08, '')
-    def mc12110_fabric = createNode('1.21.10-fabric', 1_21_10, '')
-    mc1218_fabric.link(mc12110_fabric, null)
-    mc12110_fabric.link(mc12110_fabric, null)
+    def mc262_fabric = createNode('26.2-fabric', 26_2_00, '')
+    mc262_fabric.link(mc262_fabric, null)
 }
 
 publishing {

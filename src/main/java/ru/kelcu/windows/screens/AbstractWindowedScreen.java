@@ -2,14 +2,14 @@ package ru.kelcu.windows.screens;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public abstract class AbstractWindowedScreen extends Screen {
     protected AbstractWindowedScreen(Component component) {
         super(component);
     }
 
-    public abstract ResourceLocation icon();
+    public abstract Identifier icon();
     public abstract boolean resizable();
     public abstract int getWindowType();
     public abstract int maxHeight();

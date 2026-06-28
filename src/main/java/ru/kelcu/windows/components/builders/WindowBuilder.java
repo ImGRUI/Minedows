@@ -1,10 +1,10 @@
 package ru.kelcu.windows.components.builders;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import ru.kelcu.windows.components.Window;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
 
@@ -18,7 +18,7 @@ public class WindowBuilder {
     public double height;
     public boolean active = true;
     public boolean visible = true;
-    public ResourceLocation icon = GuiUtils.getResourceLocation("windows", "textures/start/icons/cmd.png");
+    public Identifier icon = GuiUtils.getResourceLocation("windows", "textures/start/icons/cmd.png");
     public Component title;
     public Screen screen;
     public UUID uuid = UUID.randomUUID();
@@ -107,7 +107,7 @@ public class WindowBuilder {
         return this;
     }
 
-    public WindowBuilder setIcon(ResourceLocation icon){
+    public WindowBuilder setIcon(Identifier icon){
         this.icon = icon;
         return this;
     }

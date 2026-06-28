@@ -1,9 +1,9 @@
 package ru.kelcu.windows.mixin;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -30,8 +30,8 @@ public class LoadingOverlayMixin {
     private static boolean isFirstFrame = true;
     @Unique
     private static long startLoading = 0l;
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    private void render(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (Windows.gameStarted){
             long l = Util.getMillis();
             if (this.fadeIn && this.fadeInStart == -1L) {
@@ -46,10 +46,10 @@ public class LoadingOverlayMixin {
             guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFF000000);
             long time = System.currentTimeMillis() % 2000;
             String dots = ".".repeat((int) (time/500));
-            guiGraphics.drawCenteredString(AlinLib.MINECRAFT.font, Component.translatable("minedows.please_wait", dots), guiGraphics.guiWidth()/2, guiGraphics.guiHeight()/2-(AlinLib.MINECRAFT.font.lineHeight/2), 0xFFe77830);
+            guiGraphics.centeredText(AlinLib.MINECRAFT.font, Component.translatable("minedows.please_wait", dots), guiGraphics.guiWidth()/2, guiGraphics.guiHeight()/2-(AlinLib.MINECRAFT.font.lineHeight/2), 0xFFe77830);
             // End
             if (f >= 2.0F) {
-                this.minecraft.setOverlay(null);
+                this.minecraft.gui.setOverlay(null);
             }
 
             if (this.fadeOutStart == -1L && this.reload.isDone() && (!this.fadeIn || g >= 2.0F)) {
@@ -61,8 +61,8 @@ public class LoadingOverlayMixin {
                 }
 
                 this.fadeOutStart = Util.getMillis();
-                if (this.minecraft.screen != null) {
-                    this.minecraft.screen.init(this.minecraft, guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                if (this.minecraft.gui.screen() != null) {
+                    this.minecraft.gui.screen().init(guiGraphics.guiWidth(), guiGraphics.guiHeight());
                 }
             }
         } else {
@@ -88,13 +88,13 @@ public class LoadingOverlayMixin {
             int k;
             int kB;
             if (f >= 1.0F) {
-                if (this.minecraft.screen != null) {
-                    this.minecraft.screen.render(guiGraphics, 0, 0, partialTick);
+                if (this.minecraft.gui.screen() != null) {
+                    this.minecraft.gui.screen().extractRenderState(guiGraphics, 0, 0, partialTick);
                 }
                 k = kB = Mth.ceil((1.0F - Mth.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
             } else if (this.fadeIn) {
-                if (this.minecraft.screen != null && g < 1.0F) {
-                    this.minecraft.screen.render(guiGraphics, mouseX, mouseY, partialTick);
+                if (this.minecraft.gui.screen() != null && g < 1.0F) {
+                    this.minecraft.gui.screen().extractBackground(guiGraphics, mouseX, mouseY, partialTick);
                 }
                 k = kB = Mth.ceil(Mth.clamp(g, 0.15, 1.0) * 255.0);
             } else {
@@ -128,7 +128,7 @@ public class LoadingOverlayMixin {
             guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("windows", "textures/boot/logo.png"), (guiGraphics.guiWidth()/2)-(maxW/2), (guiGraphics.guiHeight()/2)-(maxH/2), 0,0, maxW, maxH, maxW, maxH);
             // End
             if (f >= 2.0F) {
-                this.minecraft.setOverlay(null);
+                this.minecraft.gui.setOverlay(null);
             }
 
             if (this.fadeOutStart == -1L && this.reload.isDone() && (!this.fadeIn || g >= 2.0F)) {
@@ -140,8 +140,8 @@ public class LoadingOverlayMixin {
                 }
 
                 this.fadeOutStart = Util.getMillis();
-                if (this.minecraft.screen != null) {
-                    this.minecraft.screen.init(this.minecraft, guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                if (this.minecraft.gui.screen() != null) {
+                    this.minecraft.gui.screen().init(guiGraphics.guiWidth(), guiGraphics.guiHeight());
                 }
             }
         }

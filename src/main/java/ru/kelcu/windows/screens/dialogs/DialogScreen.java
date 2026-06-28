@@ -1,11 +1,11 @@
 package ru.kelcu.windows.screens.dialogs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import ru.kelcu.windows.Windows;
 import ru.kelcu.windows.components.Action;
@@ -19,13 +19,13 @@ import static ru.kelcu.windows.screens.DesktopScreen.addWindow;
 public class DialogScreen extends AbstractWindowedScreen {
     public Component message;
     public Action[] actions = null;
-    public ResourceLocation icon = null;
-    public DialogScreen(Component title, Component message, ResourceLocation icon){
+    public Identifier icon = null;
+    public DialogScreen(Component title, Component message, Identifier icon){
         this(title, message, new Action[]{
-                new Action(() -> { AlinLib.MINECRAFT.setScreen(null); }, Component.literal("OK"), null)
+                new Action(() -> { AlinLib.MINECRAFT.gui.setScreen(null); }, Component.literal("OK"), null)
         }, icon);
     }
-    public DialogScreen(Component title, Component message, Action[] actions, ResourceLocation icon) {
+    public DialogScreen(Component title, Component message, Action[] actions, Identifier icon) {
         super(title);
         this.message = message;
         this.actions = actions;
@@ -33,11 +33,11 @@ public class DialogScreen extends AbstractWindowedScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         int y = 10;
         for(FormattedCharSequence formattedCharSequence : AlinLib.MINECRAFT.font.split(message, width-20)){
-            guiGraphics.drawString(AlinLib.MINECRAFT.font, formattedCharSequence, 10, y, WinColors.getTextColorWithMainColor(), false);
+            guiGraphics.text(AlinLib.MINECRAFT.font, formattedCharSequence, 10, y, WinColors.getTextColorWithMainColor(), false);
             y+=(AlinLib.MINECRAFT.font.lineHeight+3);
         };
     }
@@ -57,7 +57,7 @@ public class DialogScreen extends AbstractWindowedScreen {
     }
 
     @Override
-    public ResourceLocation icon() {
+    public Identifier icon() {
         return icon;
     }
 

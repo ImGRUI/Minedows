@@ -2,13 +2,12 @@ package ru.kelcu.windows.screens;
 
 import com.google.gson.JsonObject;
 import com.mojang.realmsclient.RealmsMainScreen;
-import com.sun.jna.platform.win32.COM.COMBindingBaseObject;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.screens.*;
+import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.achievement.StatsScreen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
@@ -21,7 +20,6 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 //#endif
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -36,13 +34,11 @@ import ru.kelcu.windows.components.Action;
 import ru.kelcu.windows.components.Cursor;
 import ru.kelcu.windows.components.Window;
 import ru.kelcu.windows.components.builders.WindowBuilder;
-import ru.kelcu.windows.mods.CatalogueActions;
 import ru.kelcu.windows.mods.FlashbackActions;
 import ru.kelcu.windows.mods.ModMenuActions;
 import ru.kelcu.windows.screens.apps.*;
 import ru.kelcu.windows.screens.components.LabelWidget;
 import ru.kelcu.windows.screens.components.VerticalConfigureScrolWidget;
-import ru.kelcu.windows.screens.dialogs.DialogScreen;
 import ru.kelcu.windows.screens.options.ControlPanelScreen;
 import ru.kelcu.windows.screens.options.SoundMixerScreen;
 import ru.kelcu.windows.utils.*;
@@ -147,7 +143,7 @@ public class DesktopScreen extends Screen {
         for(Window window : windows){
             if(window.maximize){
                 window.setSize(width, height-taskbarSize);
-                window.screen.resize(this.minecraft, (int) window.width - 6, (int) window.height - 22);
+                window.screen.resize((int) window.width - 6, (int) window.height - 22);
             } else {
                 if(window.isResizable() && (height < window.height || width < window.width)){
                     int wi = 0;
@@ -157,7 +153,7 @@ public class DesktopScreen extends Screen {
                     if(width < window.width) wi = (int) (width*0.75);
                     else wi = (int) window.width;
                     window.setSize(wi, he);
-                    window.screen.resize(this.minecraft, wi-6, he-19);
+                    window.screen.resize(wi-6, he-19);
                 }
                 if(window.x < 0 || window.y < 0 || window.x > width || window.y > height-taskbarSize){
                     window.setPosition(0, 0);
@@ -178,7 +174,7 @@ public class DesktopScreen extends Screen {
                     return;
                 }
             }
-            addWindow(new WindowBuilder().setSize(460, 200).setPosition(AlinLib.MINECRAFT.screen.width-460, AlinLib.MINECRAFT.screen.height-220).setIcon(GuiUtils.getResourceLocation("windows", "textures/sound_mixer/main.png")).setResizable(false).setScreen(new SoundMixerScreen()).build());
+            addWindow(new WindowBuilder().setSize(460, 200).setPosition(AlinLib.MINECRAFT.gui.screen().width-460, AlinLib.MINECRAFT.gui.screen().height-220).setIcon(GuiUtils.getResourceLocation("windows", "textures/sound_mixer/main.png")).setResizable(false).setScreen(new SoundMixerScreen()).build());
         }, Component.translatable("minedows.start.volume", (int) (sound * 100) +"%"), WinColors.getLightIcon(String.format("textures/start/volume_%s",
                 sound == 0 ? "muted" : sound <= 0.1 ? "low" : sound <= 0.8 ? "ok" : "max"))));
         if(FabricLoader.getInstance().isModLoaded("flashback")){
@@ -209,7 +205,7 @@ public class DesktopScreen extends Screen {
             window.active = true;
             windows.getLast().active = false;
         }
-        window.screen.init(AlinLib.MINECRAFT, (int) window.width - 6, (int) window.height - 22);
+        window.screen.init((int) window.width - 6, (int) window.height - 22);
         windows.add(window);
         taskbarWindow.add(window);
     }
@@ -229,14 +225,14 @@ public class DesktopScreen extends Screen {
     public Perlin2D perlin = new Perlin2D(0L);
     int xPerlin = 0;
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         // Background
-        if(minecraft.level != null) super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        if(minecraft.level != null) super.extractBackground(guiGraphics, mouseX, mouseY, partialTick);
         else {
             switch(Windows.config.getNumber("WALLPAPER.TYPE", 0).intValue()){
                 case 1 -> guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("minedows", "perlin"), 0, 0, 0, 0, width, height, width, height);
                 case 2 -> {
-                    renderPanorama(guiGraphics, partialTick);
+                    extractPanorama(guiGraphics, partialTick);
                     guiGraphics.fill(0, 0, width, height, 0x5F000000);
                 }
                 case 3 -> {
@@ -287,14 +283,14 @@ public class DesktopScreen extends Screen {
         ArrayList<Action> config = new ArrayList<>();
         config.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("options.accessibility"), GuiUtils.getResourceLocation("windows", "textures/start/icons/accessibility.png"), new AccessibilityOptionsScreen(null, minecraft.options)));
         config.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("options.language"), GuiUtils.getResourceLocation("windows", "textures/start/icons/language.png"), new LanguageSelectScreen(null, minecraft.options, minecraft.getLanguageManager())));
-        config.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("menu.options"), GuiUtils.getResourceLocation("windows", "textures/start/icons/options.png"), new OptionsScreen(null, minecraft.options)));
+        config.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("menu.options"), GuiUtils.getResourceLocation("windows", "textures/start/icons/options.png"), new OptionsScreen(null, minecraft.options, Minecraft.getInstance().level != null)));
         config.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("minedows.control"), GuiUtils.getResourceLocation("windows", "textures/start/icons/computer_gear.png"), new WindowBuilder().setSize(325, 240).setScreen(new ControlPanelScreen())));
         links.put("1", config);
         ArrayList<Action> title = new ArrayList<>();
         if(Minecraft.getInstance().level != null) {
             title.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("gui.stats"), GuiUtils.getResourceLocation("windows", "textures/start/icons/stats.png"), new StatsScreen(null, Minecraft.getInstance().player.getStats())));
             title.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("gui.advancements"), GuiUtils.getResourceLocation("windows", "textures/start/icons/advancements.png"), new AdvancementsScreen(Minecraft.getInstance().player.connection.getAdvancements(), null)));
-            if(this.minecraft.hasSingleplayerServer() && !this.minecraft.getSingleplayerServer().isPublished()) title.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("menu.shareToLan"), GuiUtils.getResourceLocation("windows", "textures/start/icons/world_network.png"), new ShareToLanScreen(null)));
+            if(this.minecraft.hasSingleplayerServer() && !this.minecraft.getSingleplayerServer().isPublished()) title.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("menu.shareToLan"), GuiUtils.getResourceLocation("windows", "textures/start/icons/world_network.png"), new MultiplayerOptionsScreen(null)));
         } else {
             title.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("menu.online"), GuiUtils.getResourceLocation("windows", "textures/start/icons/realms.png"), new RealmsMainScreen(null)));
             title.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("multiplayer.title"), GuiUtils.getResourceLocation("windows", "textures/start/icons/world_network.png"), new JoinMultiplayerScreen(null)));
@@ -303,7 +299,7 @@ public class DesktopScreen extends Screen {
         links.put("2", title);
         ArrayList<Action> apps = new ArrayList<>();
         if(Windows.isModMenuInstalled() || Windows.isCatalogueInstalled()){
-            apps.add(new Action(Action.Type.OPEN_SCREEN, (Windows.isModMenuInstalled() ? ModMenuActions.getModText() : Windows.isCatalogueInstalled() ? Component.translatable("catalogue.gui.mod_list") : Component.empty()), GuiUtils.getResourceLocation("windows", "textures/start/icons/cmd.png"), Windows.isCatalogueInstalled() ? CatalogueActions.getScreen() : ModMenuActions.getScreen()));
+            apps.add(new Action(Action.Type.OPEN_SCREEN, (Windows.isModMenuInstalled() ? ModMenuActions.getModText() : Windows.isCatalogueInstalled() ? Component.translatable("catalogue.gui.mod_list") : Component.empty()), GuiUtils.getResourceLocation("windows", "textures/start/icons/cmd.png"), ModMenuActions.getScreen()));
         }
         apps.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("minedows.paint"), GuiUtils.getResourceLocation("windows", "textures/start/icons/paint.png"), new WindowBuilder().setIcon(GuiUtils.getResourceLocation("windows", "textures/start/icons/paint.png")).setScreen(new PaintScreen())));
         apps.add(new Action(Action.Type.OPEN_SCREEN, Component.translatable("minedows.calc"), GuiUtils.getResourceLocation("windows", "textures/start/icons/calc.png"), new WindowBuilder().setIcon(GuiUtils.getResourceLocation("windows", "textures/start/icons/calc.png")).setResizable(false).setSize(206, 165).setScreen(new CalcScreen())));
@@ -341,7 +337,7 @@ public class DesktopScreen extends Screen {
     }
     public int xWindowTask = 0;
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if(Windows.isDeveloperPreview() && !Windows.config.getBoolean("DISABLE_WARN_TEXT", false)){
             Component warn = Component.translatable("minedows.warn.development.build");
             List<FormattedCharSequence> warning = font.split(warn, width/2);
@@ -349,21 +345,21 @@ public class DesktopScreen extends Screen {
             for(FormattedCharSequence w : warning) yG -= (3 + font.lineHeight);
             String title = String.format("Minedows 98 v%s", FabricLoader.getInstance().getModContainer("minedows").get().getMetadata().getVersion().getFriendlyString());
             String copy = "@Clovisoft";
-            guiGraphics.drawString(font, title, width-5- font.width(title), yG, -1);
+            guiGraphics.text(font, title, width-5- font.width(title), yG, -1);
             yG+=(3+font.lineHeight);
             for(FormattedCharSequence formattedCharSequence : warning) {
-                guiGraphics.drawString(font, formattedCharSequence, width - 5 - font.width(formattedCharSequence), yG, -1);
+                guiGraphics.text(font, formattedCharSequence, width - 5 - font.width(formattedCharSequence), yG, -1);
                 yG += (3 + font.lineHeight);
             }
-            guiGraphics.drawString(font, copy, width-5- font.width(copy), yG, -1);
+            guiGraphics.text(font, copy, width-5- font.width(copy), yG, -1);
         }
         // Window
         for(Renderable renderable : this.renderables) {
-            renderable.render(guiGraphics, mouseX, mouseY, partialTick);
+            renderable.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         }
         //#if MC > 12110
-        guiGraphics.renderDeferredElements();
-        guiGraphics.deferredOutlines.clear();
+        guiGraphics.extractDeferredElements(mouseX, mouseY, partialTick);
+//        guiGraphics.deferredOutlines.clear();
         guiGraphics.deferredTooltip = null;
         //#endif
         for (Window window : windows) {
@@ -381,7 +377,7 @@ public class DesktopScreen extends Screen {
         if(2 < mouseX && mouseX < 2 + 8 + font.width(startComponent) && height-(taskbarSize-3) < mouseY && mouseY < height-1)
             WindowUtils.renderRevertPanel(guiGraphics,2, height-(taskbarSize-3),  2 + 8 + font.width(startComponent), height - 1);
         else WindowUtils.renderPanel(guiGraphics,2, height-(taskbarSize-3),  2 + 8 + font.width(startComponent), height - 1);
-        guiGraphics.drawString(font, startComponent, 6, textY, WinColors.getTextColorWithMainColor(), false);
+        guiGraphics.text(font, startComponent, 6, textY, WinColors.getTextColorWithMainColor(), false);
 
         if(startMenuShowed){
             HashMap<String, ArrayList<Action>> categories = getActionsMainMenu();
@@ -405,8 +401,8 @@ public class DesktopScreen extends Screen {
                 for(Action action : actions){
                     yA -= 22;
                     boolean focused = 20 < mouseX && mouseX < startMenuWidth - 4 && yA < mouseY && mouseY < yA + 20;
-                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED, action.icon, 23, yA, 0, 0, 20, 20, 20, 20);
-                    guiGraphics.drawString(font, Component.empty().append(action.title).withStyle(Style.EMPTY.withUnderlined(focused)),48, yA+(10-(font.lineHeight/2)), WinColors.getTextColorWithMainColor(), false);
+                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED, action.icon, 23, yA, 0, 0, 20, 20, 20, 20, -1);
+                    guiGraphics.text(font, Component.empty().append(action.title).withStyle(Style.EMPTY.withUnderlined(focused)),48, yA+(10-(font.lineHeight/2)), WinColors.getTextColorWithMainColor(), false);
                 }
             }
         }
@@ -432,16 +428,16 @@ public class DesktopScreen extends Screen {
                 WindowUtils.renderRevertPanel(guiGraphics, xW, height-taskbarSize+3, xW+2 + 8 + xAdditional + font.width(title), height-1);
             else WindowUtils.renderPanel(guiGraphics, xW, height-taskbarSize+3, xW+2 + 8 + xAdditional + font.width(title), height-1);
             if(window.icon != null){
-                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, window.icon, xW+5, textY, 0, 0, 10, 10, 10, 10);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, window.icon, xW+5, textY, 0, 0, 10, 10, 10, 10, -1);
                 xW+=15;
             }
-            guiGraphics.drawString(font, title, xW+5, textY, WinColors.getTextColorWithMainColor(), false);
+            guiGraphics.text(font, title, xW+5, textY, WinColors.getTextColorWithMainColor(), false);
             xW+= (2 + 8 + font.width(title) + 2);
         }
         guiGraphics.disableScissor();
         int xA = xWindowTask+verticalConfigureScrolWidget.getWidth()+5+(taskbarSize*Math.max(0, getTaskbarActions().size()-1));
         for(Action action : getTaskbarActions()){
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, action.icon, xA, height-taskbarSize+4, 0 ,0, 14, 14, 14, 14);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, action.icon, xA, height-taskbarSize+4, 0 ,0, 14, 14, 14, 14, -1);
             if(xA < mouseX && mouseX < xA+14 && height-taskbarSize+4 < mouseY && mouseY < height-taskbarSize+18)
                 guiGraphics.setTooltipForNextFrame(action.title, mouseX, mouseY);
             xA-=taskbarSize;
@@ -454,7 +450,7 @@ public class DesktopScreen extends Screen {
         guiGraphics.fill(width - 2, height - (taskbarSize-3), width - (2 + 9 + font.width(time)), height - 1, colors[3]);
         guiGraphics.fill(width - 2, height - (taskbarSize-4), width - (1 + 9 + font.width(time)), height - 1, colors[0]);
         guiGraphics.fill(width - 3, height - (taskbarSize-4), width - (1 + 9 + font.width(time)), height - 2, colors[2]);
-        guiGraphics.drawString(font, time, width - 6 - font.width(time), textY+1, WinColors.getTextColorWithMainColor(), false);
+        guiGraphics.text(font, time, width - 6 - font.width(time), textY+1, WinColors.getTextColorWithMainColor(), false);
     }
 
     public int[] getMouseForLabels(int x, int y){
@@ -478,7 +474,7 @@ public class DesktopScreen extends Screen {
 
     static int buttonSize = 10;
     public static Window currentRenderedWindow;
-    public static void renderWindow(GuiGraphics guiGraphics, Window window, int mouseX, int mouseY, float tick) {
+    public static void renderWindow(GuiGraphicsExtractor guiGraphics, Window window, int mouseX, int mouseY, float tick) {
         int x = (int) window.x;
         int y = (int) window.y;
         int width = (int) window.width;
@@ -544,25 +540,25 @@ public class DesktopScreen extends Screen {
         if(AlinLib.MINECRAFT.font.width(title) > maxTitleWidth){
             title = AlinLib.MINECRAFT.font.substrByWidth(Component.literal(title), maxTitleWidth - (AlinLib.MINECRAFT.font.width("..."))).getString()+"...";
         }
-        guiGraphics.drawString(AlinLib.MINECRAFT.font, title, x +xTitle+ 6, y + 6, 0xFFFFFFFF, false);
+        guiGraphics.text(AlinLib.MINECRAFT.font, title, x +xTitle+ 6, y + 6, 0xFFFFFFFF, false);
         guiGraphics.pose().pushMatrix();
         guiGraphics.enableScissor(x+3, y+19, x+width-3, y+height-3);
         guiGraphics.pose().translate(x+3, y+19);
 //        window.screen.renderWithTooltip(guiGraphics, mouseXforScreen, mouseYforScreen, tick);
         guiGraphics.nextStratum();
-        window.screen.renderBackground(guiGraphics, mouseXforScreen, mouseYforScreen, tick);
+        window.screen.extractBackground(guiGraphics, mouseXforScreen, mouseYforScreen, tick);
         guiGraphics.nextStratum();
-        window.screen.render(guiGraphics, mouseXforScreen, mouseYforScreen, tick);
+        window.screen.extractRenderState(guiGraphics, mouseXforScreen, mouseYforScreen, tick);
         //#if MC >= 12110
-        if (!guiGraphics.deferredOutlines.isEmpty()) {
-            guiGraphics.nextStratum();
-
-            for(GuiGraphics.OutlineBox outlineBox : guiGraphics.deferredOutlines) {
-                outlineBox.render(guiGraphics);
-            }
-
-            guiGraphics.deferredOutlines.clear();
-        }
+//        if (!guiGraphics.deferredOutlines.isEmpty()) {
+//            guiGraphics.nextStratum();
+//
+//            for(GuiGraphicsExtractor.OutlineBox outlineBox : guiGraphics.deferredOutlines) {
+//                outlineBox.render(guiGraphics);
+//            }
+//
+//            guiGraphics.deferredOutlines.clear();
+//        }
         //#endif
         guiGraphics.disableScissor();
         //#if MC < 12110
@@ -573,7 +569,7 @@ public class DesktopScreen extends Screen {
             guiGraphics.deferredTooltip.run();
             guiGraphics.deferredTooltip = null;
         }
-        guiGraphics.renderDeferredElements();
+        guiGraphics.extractDeferredElements(mouseXforScreen, mouseYforScreen, tick);
         //#endif
         guiGraphics.pose().translate(-x-3, -y-19);
         guiGraphics.pose().popMatrix();
@@ -630,7 +626,7 @@ public class DesktopScreen extends Screen {
                 return true;
             } else if(window.isResized){
                 window.setSize(window.width+dragX, window.height+dragY);
-                window.screen.resize(this.minecraft, (int) window.width - 6, (int) window.height - 22);
+                window.screen.resize((int) window.width - 6, (int) window.height - 22);
                 return true;
             }
         }
@@ -648,7 +644,7 @@ public class DesktopScreen extends Screen {
                 && window.y+window.height-14 < mouseY && mouseY < window.y + window.height+6){
                     window.setResized(true);
                     window.setSize(window.width+dragX, window.height+dragY);
-                    window.screen.resize(this.minecraft, (int) window.width - 6, (int) window.height - 22);
+                    window.screen.resize((int) window.width - 6, (int) window.height - 22);
                     ret = true;
                 } else {
                     window.setScreenDragging(true);
@@ -890,7 +886,7 @@ public class DesktopScreen extends Screen {
         //#endif
         if(2 < d && d < 2 + 8 + font.width(startComponent) && height-(taskbarSize-3) < e && e < height-1 && j == GLFW.GLFW_MOUSE_BUTTON_LEFT){
             if(Windows.config.getString("WALLPAPER.FILE", "").equals("fluffy_forever") && Windows.config.getNumber("WALLPAPER.TYPE", 0).intValue() == 3)
-                AlinLib.MINECRAFT.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CAT_AMBIENT, 1f, 1f));
+                AlinLib.MINECRAFT.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CAT_AMBIENT_BABY.value(), 1f, 1f));
             this.startMenuShowed = !startMenuShowed;
             if(!windows.isEmpty()) windows.getLast().active = false;
             SoundUtils.click();
@@ -980,7 +976,7 @@ public class DesktopScreen extends Screen {
                     if(window.getButtons() == 0 && window.isResizable()){
                         if(xb < d && d < xb+buttonSize && y+5 < e && e < y+5+buttonSize) {
                             window.changeMax(this.width, this.height-taskbarSize);
-                            window.screen.resize(this.minecraft, (int) window.width - 6, (int) window.height - 22);
+                            window.screen.resize((int) window.width - 6, (int) window.height - 22);
                             SoundUtils.click();
                             return true;
                         }
@@ -1033,6 +1029,6 @@ public class DesktopScreen extends Screen {
 
     @Override
     public void onClose() {
-        if(minecraft.level != null) minecraft.setScreen(null);
+        if(minecraft.level != null) minecraft.gui.setScreen(null);
     }
 }

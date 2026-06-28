@@ -12,7 +12,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import ru.kelcu.windows.components.Action;
 import ru.kelcu.windows.components.Window;
@@ -88,12 +88,12 @@ public class Windows implements ClientModInitializer {
         GuiUtils.registerStyle(minedowsStyle);
         ClientLifecycleEvents.CLIENT_FULL_STARTED.register((s) -> {
             gameStarted = true;
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("windows", "windows_startup")), 1.0F));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath("windows", "windows_startup")), 1.0F));
             perlinNoises = new Thread(() -> {
                 while(true) {
                         try {
                             if(config.getNumber("WALLPAPER.TYPE", 0).intValue() == 1 && AlinLib.MINECRAFT.level == null) {
-                                generatePerlin(AlinLib.MINECRAFT.screen.width / 2, AlinLib.MINECRAFT.screen.height / 2);
+                                generatePerlin(AlinLib.MINECRAFT.gui.screen().width / 2, AlinLib.MINECRAFT.gui.screen().height / 2);
                                 xPerlin++;
                             } else sleep(500);
                         } catch (Exception ex) {
@@ -123,16 +123,16 @@ public class Windows implements ClientModInitializer {
     public static void executeAction(Action action){
         switch (action.type){
             case STOP_GAME -> Minecraft.getInstance().stop();
-            case UNPAUSE_GAME -> Minecraft.getInstance().setScreen(null);
+            case UNPAUSE_GAME -> Minecraft.getInstance().gui.setScreen(null);
             case DISCONNECT ->
                 //#if MC < 12110
                 //$$PauseScreen.disconnectFromWorld(AlinLib.MINECRAFT, ClientLevel.DEFAULT_QUIT_MESSAGE);
                 //#else
-                    AlinLib.MINECRAFT.getReportingContext().draftReportHandled(AlinLib.MINECRAFT, AlinLib.MINECRAFT.screen, () -> AlinLib.MINECRAFT.disconnectFromWorld(ClientLevel.DEFAULT_QUIT_MESSAGE), true);
+                    AlinLib.MINECRAFT.getReportingContext().draftReportHandled(AlinLib.MINECRAFT, AlinLib.MINECRAFT.gui.screen(), () -> AlinLib.MINECRAFT.disconnectFromWorld(ClientLevel.DEFAULT_QUIT_MESSAGE), true);
                 //#endif
             case OPEN_SCREEN -> {
-                if(AlinLib.MINECRAFT.screen instanceof DesktopScreen)
-                    AlinLib.MINECRAFT.screen.rebuildWidgets();
+                if(AlinLib.MINECRAFT.gui.screen() instanceof DesktopScreen)
+                    AlinLib.MINECRAFT.gui.screen().rebuildWidgets();
                 DesktopScreen.addWindow(action.getWindow());
             }
             case EXECUTE_ACTION -> action.execute.execute();

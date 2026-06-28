@@ -2,7 +2,7 @@ package ru.kelcu.windows.screens.components;
 
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.PauseScreen;
@@ -39,7 +39,7 @@ public class LabelWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
         List<FormattedCharSequence> list = AlinLib.MINECRAFT.font.split(action.title, (int) (width*1.65));
         int yA = getWidth()+3;
         int max /* не мессенжер */ = isHovered() ? 100 : 2;
@@ -59,11 +59,11 @@ public class LabelWidget extends AbstractWidget {
                     //#if MC < 12110
                     //$$renderOutline
                     //#else
-                            submitOutline
+                            outline
                     //#endif
                             (getX()-3, getY()-3, getWidth()+6, yA+3, 0x3e0000F3);
         }
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, action.icon, getX()+6, getY()+6, 0, 0, getWidth()-12, getWidth()-12, getWidth()-12, getWidth()-12);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, action.icon, getX()+6, getY()+6, 0, 0, getWidth()-12, getWidth()-12, getWidth()-12, getWidth()-12, -1);
         // -=-=-=-
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(getX(), getY()+getWidth());
@@ -73,7 +73,7 @@ public class LabelWidget extends AbstractWidget {
         if(!isBlackDuck && AlinLib.MINECRAFT.level != null) color = -1;
         for(FormattedCharSequence formattedCharSequence : list){
             if(pw == max) break;
-            guiGraphics.drawString(AlinLib.MINECRAFT.font, formattedCharSequence, (int) ((getWidth()/1.5)-(AlinLib.MINECRAFT.font.width(formattedCharSequence)*0.5)), y, color, false);
+            guiGraphics.text(AlinLib.MINECRAFT.font, formattedCharSequence, (int) ((getWidth()/1.5)-(AlinLib.MINECRAFT.font.width(formattedCharSequence)*0.5)), y, color, false);
             y+= (6+AlinLib.MINECRAFT.font.lineHeight);
             pw++;
         }

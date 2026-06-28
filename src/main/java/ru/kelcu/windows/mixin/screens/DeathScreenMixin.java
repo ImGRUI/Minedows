@@ -2,7 +2,7 @@ package ru.kelcu.windows.mixin.screens;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -44,9 +44,6 @@ public abstract class DeathScreenMixin extends Screen {
 
     @Shadow @Final private Component causeOfDeath;
 
-    @Shadow @Nullable
-    protected abstract Style getClickedComponentStyleAt(int i);
-
     @Shadow
     protected abstract void init();
 
@@ -72,15 +69,15 @@ public abstract class DeathScreenMixin extends Screen {
                             //#if MC < 12110
                             //$$PauseScreen.disconnectFromWorld(AlinLib.MINECRAFT, ClientLevel.DEFAULT_QUIT_MESSAGE)
                             //#else
-                            AlinLib.MINECRAFT.getReportingContext().draftReportHandled(AlinLib.MINECRAFT, AlinLib.MINECRAFT.screen, () -> AlinLib.MINECRAFT.disconnectFromWorld(ClientLevel.DEFAULT_QUIT_MESSAGE), true)
+                            AlinLib.MINECRAFT.getReportingContext().draftReportHandled(AlinLib.MINECRAFT, AlinLib.MINECRAFT.gui.screen(), () -> AlinLib.MINECRAFT.disconnectFromWorld(ClientLevel.DEFAULT_QUIT_MESSAGE), true)
                             //#endif
                             )
                     .setPosition(x+105, y).setSize(100, 18).build());
         }
         cl.cancel();
     }
-    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f, CallbackInfo ci) {
         if(isDisabled()) return;
         ci.cancel();
     }
@@ -116,7 +113,7 @@ public abstract class DeathScreenMixin extends Screen {
                 //#if MC < 12110
                 //$$PauseScreen.disconnectFromWorld(AlinLib.MINECRAFT, ClientLevel.DEFAULT_QUIT_MESSAGE);
                 //#else
-                AlinLib.MINECRAFT.getReportingContext().draftReportHandled(AlinLib.MINECRAFT, AlinLib.MINECRAFT.screen, () -> AlinLib.MINECRAFT.disconnectFromWorld(ClientLevel.DEFAULT_QUIT_MESSAGE), true);
+                AlinLib.MINECRAFT.getReportingContext().draftReportHandled(AlinLib.MINECRAFT, AlinLib.MINECRAFT.gui.screen(), () -> AlinLib.MINECRAFT.disconnectFromWorld(ClientLevel.DEFAULT_QUIT_MESSAGE), true);
             //#endif
 
         }
@@ -129,10 +126,10 @@ public abstract class DeathScreenMixin extends Screen {
         );
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphicsExtractor guiGraphics, int i, int j, float f, CallbackInfo ci) {
         if(isDisabled()) return;
-        super.render(guiGraphics, i, j, f);
+        super.extractRenderState(guiGraphics, i, j, f);
         if(isNiko()){
             ci.cancel();
             guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFF0000);
@@ -144,33 +141,26 @@ public abstract class DeathScreenMixin extends Screen {
             int x = guiGraphics.guiWidth() / 2 - w / 2;
             int y = guiGraphics.guiHeight() / 2 - h / 2;
             guiGraphics.fill(guiGraphics.guiWidth()/2-(font.width(Component.literal("CRITICAL ERROR"))/2)-6, y-3, guiGraphics.guiWidth()/2+(font.width(Component.literal("CRITICAL ERROR"))/2)+6, y+ font.lineHeight+3, -1);
-            guiGraphics.drawString(font, Component.literal("CRITICAL ERROR"), guiGraphics.guiWidth()/2-(font.width(Component.literal("CRITICAL ERROR"))/2), y, 0xFFFF0000, false);
+            guiGraphics.text(font, Component.literal("CRITICAL ERROR"), guiGraphics.guiWidth()/2-(font.width(Component.literal("CRITICAL ERROR"))/2), y, 0xFFFF0000, false);
             y+=15+font.lineHeight;
             for(FormattedCharSequence formattedCharSequence : messages){
-                guiGraphics.drawString(font, formattedCharSequence, guiGraphics.guiWidth()/2-(font.width(formattedCharSequence)/2), y, -1, false);
+                guiGraphics.text(font, formattedCharSequence, guiGraphics.guiWidth()/2-(font.width(formattedCharSequence)/2), y, -1, false);
                 y+=2+font.lineHeight;
             }
             y+=13;
-            guiGraphics.drawString(font, Component.translatable("minedows.bsod.hardcore.spectate", Component.translatable("deathScreen.spectate")),
+            guiGraphics.text(font, Component.translatable("minedows.bsod.hardcore.spectate", Component.translatable("deathScreen.spectate")),
                     guiGraphics.guiWidth()/2-(font.width(Component.translatable("minedows.bsod.hardcore.spectate", Component.translatable("deathScreen.spectate")))/2), y, -1, false);
             y+=13;
-            guiGraphics.drawString(font, Component.translatable("minedows.bsod.hardcore.title", Component.translatable("deathScreen.titleScreen")),
+            guiGraphics.text(font, Component.translatable("minedows.bsod.hardcore.title", Component.translatable("deathScreen.titleScreen")),
                     guiGraphics.guiWidth()/2-(font.width(Component.translatable("minedows.bsod.hardcore.title", Component.translatable("deathScreen.titleScreen")))/2), y, -1, false);
         } else {
             int y = 5;
             if (this.causeOfDeath != null) {
-                guiGraphics.drawString(this.font, this.causeOfDeath, 5, y, WinColors.getTextColorWithMainColor(), false);
+                guiGraphics.text(this.font, this.causeOfDeath, 5, y, WinColors.getTextColorWithMainColor(), false);
             }
             y+=15;
 
-            guiGraphics.drawString(this.font, this.deathScore, 5, y, WinColors.getTextColorWithMainColor(), false);
-            if (this.causeOfDeath != null && j > (y-15)) {
-                Objects.requireNonNull(this.font);
-                if (j < (y-15) + 9) {
-                    Style style = this.getClickedComponentStyleAt(i);
-                    guiGraphics.renderComponentHoverEffect(this.font, style, i, j);
-                }
-            }
+            guiGraphics.text(this.font, this.deathScore, 5, y, WinColors.getTextColorWithMainColor(), false);
             ci.cancel();
         }
 

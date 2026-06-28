@@ -1,7 +1,7 @@
 package ru.kelcu.windows.mixin.components;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.kelcu.windows.Windows;
 import ru.kelcuprum.alinlib.gui.GuiUtils;
+import ru.kelcuprum.alinlib.gui.components.text.TextBox;
 
 @Mixin(AbstractSliderButton.class)
 public abstract class AbstractSliderButtonMixin extends AbstractWidget {
@@ -27,7 +28,7 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget {
 
     @Override
     @Unique
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
 
     }
 
@@ -37,11 +38,12 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget {
 
     }
 
-    @Inject(method = "renderWidget", at = @At("HEAD"), cancellable = true)
-    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractWidgetRenderState", at = @At("HEAD"), cancellable = true)
+    public void renderWidget(GuiGraphicsExtractor guiGraphics, int i, int j, float f, CallbackInfo ci) {
         Windows.minedowsStyle.renderBackground$slider(guiGraphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.active, this.isHoveredOrFocused(), this.value);
         int k = this.active ? 16777215 : 10526880;
-        this.renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, k | Mth.ceil(this.alpha * 255.0F) << 24);
+        this.extractScrollingStringOverContents(guiGraphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE), this.getMessage(), 2);
+        this.handleCursor(guiGraphics);
         ci.cancel();
     }
 }

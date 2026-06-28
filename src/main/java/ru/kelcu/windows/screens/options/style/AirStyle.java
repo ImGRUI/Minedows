@@ -1,13 +1,9 @@
 package ru.kelcu.windows.screens.options.style;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import ru.kelcu.windows.utils.WindowUtils;
 import ru.kelcuprum.alinlib.gui.Colors;
-import ru.kelcuprum.alinlib.gui.GuiUtils;
 import ru.kelcuprum.alinlib.gui.components.builder.text.TextBuilder;
 import ru.kelcuprum.alinlib.gui.styles.AbstractStyle;
 
@@ -17,11 +13,11 @@ public class AirStyle extends AbstractStyle {
     }
 
     @Override
-    public void renderBackground$widget(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused) {
+    public void renderBackground$widget(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused) {
     }
 
     @Override
-    public void renderBackground$slider(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused, double position) {
+    public void renderBackground$slider(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, boolean active, boolean isHoveredOrFocused, double position) {
         WindowUtils.welcomeToWhiteSpace(guiGraphics,x+2, y+2, width-4, height-4);
         int color = 0xff717171;
         int colorb = isHoveredOrFocused ? Colors.getWinColor() : 0xFFC0C0C0;

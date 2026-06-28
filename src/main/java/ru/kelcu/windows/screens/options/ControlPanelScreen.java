@@ -2,7 +2,7 @@ package ru.kelcu.windows.screens.options;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
@@ -13,7 +13,6 @@ import net.minecraft.util.FormattedCharSequence;
 import ru.kelcu.windows.Windows;
 import ru.kelcu.windows.components.Action;
 import ru.kelcu.windows.components.builders.WindowBuilder;
-import ru.kelcu.windows.screens.components.LabelConfWidget;
 import ru.kelcu.windows.screens.components.LabelWidget;
 import ru.kelcu.windows.screens.info.WindowsVersion;
 import ru.kelcu.windows.utils.ThemeManager;
@@ -41,7 +40,7 @@ public class ControlPanelScreen extends Screen {
     }
     public void initLabels(){
         widgets = new ArrayList<>();
-        widgets.add(new LabelWidget(-50, 0, 40, new Action(Action.Type.OPEN_SCREEN, Component.translatable("minedows.control.minecraft"), GuiUtils.getResourceLocation("windows","textures/start/icons/shutdown.png"), new WindowBuilder().setScreen(new OptionsScreen(null, Minecraft.getInstance().options)))));
+        widgets.add(new LabelWidget(-50, 0, 40, new Action(Action.Type.OPEN_SCREEN, Component.translatable("minedows.control.minecraft"), GuiUtils.getResourceLocation("windows","textures/start/icons/shutdown.png"), new WindowBuilder().setScreen(new OptionsScreen(null, Minecraft.getInstance().options, Minecraft.getInstance().level != null)))));
         widgets.add(new LabelWidget(-50, 0, 40, new Action(Action.Type.OPEN_SCREEN, Component.translatable("alinlib"), GuiUtils.getResourceLocation("alinlib","icon.png"), new WindowBuilder().setScreen(DesignScreen.build(null)))));
         if(FabricLoader.getInstance().isModLoaded("mcef")) widgets.add(new LabelWidget(-50, 0, 40, new Action(Action.Type.OPEN_SCREEN, Component.translatable("minedows.browser.options"), GuiUtils.getResourceLocation("windows","textures/browser/icon.png"), new WindowBuilder().setScreen(getBrowserOption()).setSize(450, 200))));
         widgets.add(new LabelWidget(-50, 0, 40, new Action(Action.Type.OPEN_SCREEN, Component.translatable("minedows.system_options"), GuiUtils.getResourceLocation("windows","textures/start/icons/options.png"), new WindowBuilder().setScreen(getSystemOption()))));
@@ -116,8 +115,8 @@ public class ControlPanelScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         WindowUtils.welcomeToWhiteSpace(guiGraphics, 0, 0, width, height);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("windows", "textures/options/background.png"), 1, 1, 0, 0, 100, 150, 100, 150);
         int fruik =90;
@@ -126,7 +125,7 @@ public class ControlPanelScreen extends Screen {
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("windows", "textures/start/icons/computer_gear.png"), x, y, 0, 0, 35, 35, 35, 35);
         y+=45;
         for(FormattedCharSequence formattedCharSequence : font.split(Component.empty().append(getTitle()).withStyle(Style.EMPTY.withBold(true)), fruik)){
-            guiGraphics.drawString(font, formattedCharSequence, x, y, 0xFF000000, false);
+            guiGraphics.text(font, formattedCharSequence, x, y, 0xFF000000, false);
             y += font.lineHeight + 3;
         }
         y+=5;
@@ -142,15 +141,15 @@ public class ControlPanelScreen extends Screen {
         }
         y+=15;
         for(FormattedCharSequence formattedCharSequence : font.split(Component.translatable(widgets.isEmpty() ? "minedows.control.description.empty" : "minedows.control.description"), fruik)){
-            guiGraphics.drawString(font, formattedCharSequence, x, y, 0xFF000000, false);
+            guiGraphics.text(font, formattedCharSequence, x, y, 0xFF000000, false);
             y += font.lineHeight + 3;
         }
     }
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.enableScissor(1, 1, width-1, height-1);
-        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.render(guiGraphics, i, j, f);
+        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.disableScissor();
     }
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {

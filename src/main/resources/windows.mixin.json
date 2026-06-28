@@ -35,8 +35,6 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "figura.UIHelperMixin",
-    "lamb.RandomPrideFlagBackgroundMixin",
     "mcef.CefClientMixin",
     "screens.ConfigScreenBuilderMixin"
   ]

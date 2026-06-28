@@ -1,6 +1,6 @@
 package ru.kelcu.windows.screens.components;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 //#if MC >= 12106
 import net.minecraft.client.renderer.RenderPipelines;
@@ -8,10 +8,9 @@ import net.minecraft.client.renderer.RenderPipelines;
 //#if MC >= 12110
 import net.minecraft.client.input.MouseButtonEvent;
 //#endif
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import ru.kelcu.windows.Windows;
@@ -27,21 +26,20 @@ public class VolumeComponent extends AbstractSliderButton {
         super(x, y, width, height, Component.empty(), AlinLib.MINECRAFT.options.getSoundSourceVolume(soundSource));
         this.soundSource = soundSource;
     }
-
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
         int[] colors = WinColors.getHorizontalRuleColors();
         guiGraphics.fill(getX()+(getWidth()/2)-1, getY(), getX()+(getWidth()/2)+1, getBottom(), colors[0]);
         guiGraphics.fill(getX()+(getWidth()/2)-1, getY(), getX()+(getWidth()/2), getBottom()-1, colors[1]);
         int w = Math.min(getWidth(), 20);
         int y = (int) (getY()+getHeight()-(getHeight()*value));
         Windows.minedowsStyle.renderBackground$widget(guiGraphics, getX()+(getWidth()/2)-(w/2), y-5, w, 10, active, isHoveredOrFocused());
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED,getSpeakerVolumeIcon(), getX()+(getWidth()/2)-7, getBottom()+3, 0f, 0f, 14, 14, 14, 14);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED,getSpeakerVolumeIcon(), getX()+(getWidth()/2)-7, getBottom()+3, 0f, 0f, 14, 14, 14, 14, -1);
         if(isHovered())
             guiGraphics.setTooltipForNextFrame(Component.literal((int) (value*100)+"%"), i, j);
     }
 
-    public ResourceLocation getSpeakerVolumeIcon(){
+    public Identifier getSpeakerVolumeIcon(){
         float f = AlinLib.MINECRAFT.options.getSoundSourceVolume(soundSource);
         return GuiUtils.getResourceLocation("windows", String.format("textures/start/volume_%s.png",
                 f == 0 ? "muted" : f <= 0.1 ? "low" : f <= 0.8 ? "ok" : "max"));

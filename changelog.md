@@ -1,2 +1,1 @@
-- Ported to new kernel - 1.21.10
-- Added build number in winver.exe
+- Updated kernel to 26.2

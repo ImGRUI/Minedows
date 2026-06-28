@@ -2,8 +2,8 @@ package ru.kelcu.windows.mixin.game_ui.bars;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.contextualbar.ExperienceBarRenderer;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.contextualbar.ExperienceBar;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,14 +16,14 @@ import ru.kelcu.windows.utils.WinColors;
 
 import static ru.kelcuprum.alinlib.gui.Colors.SEADRIVE;
 
-@Mixin(ExperienceBarRenderer.class)
+@Mixin(ExperienceBar.class)
 public class ExperienceBarRendererMixin {
     @Shadow
     @Final
     private Minecraft minecraft;
 
-    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
-    public void renderBackground(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci){
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBackground(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci){
         if(!Windows.config.getBoolean("ENABLE_NEW_UI", false)) return;
         assert this.minecraft.player != null;
         renderBar(guiGraphics, getHotBarX(guiGraphics), getHotBarY(guiGraphics)-7, SEADRIVE, 186, 5, this.minecraft.player.experienceProgress);
@@ -31,7 +31,7 @@ public class ExperienceBarRendererMixin {
         ci.cancel();
     }
     @Unique
-    void renderBar(GuiGraphics guiGraphics, int x, int y, int color, int size, int height, double value){
+    void renderBar(GuiGraphicsExtractor guiGraphics, int x, int y, int color, int size, int height, double value){
         int[] colors = WinColors.getWindowColors();
         // 3
         // 4
@@ -49,11 +49,11 @@ public class ExperienceBarRendererMixin {
         return 0x75000000;
     }
     @Unique
-    public int getHotBarX(GuiGraphics guiGraphics){
+    public int getHotBarX(GuiGraphicsExtractor guiGraphics){
         return guiGraphics.guiWidth() / 2 - (186 / 2);
     }
     @Unique
-    public int getHotBarY(GuiGraphics guiGraphics){
+    public int getHotBarY(GuiGraphicsExtractor guiGraphics){
         return guiGraphics.guiHeight() - 26;
     }
 }

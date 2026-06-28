@@ -24,7 +24,7 @@ public abstract class TitleScreenMixin {
                         button.setPosition((int) (button.getX() - (button.getWidth() * Math.random() * (Math.random() < 0.5 ? -1 : 1))), (int) (button.getY() - (button.getHeight() * Math.random() * (Math.random() < 0.5 ? -1 : 1))));
                         SoundUtils.error();
                     } else {
-                        AlinLib.MINECRAFT.setScreen(new OutOfMemoryScreen());
+                        AlinLib.MINECRAFT.gui.setScreen(new OutOfMemoryScreen());
                     }
                 }).bounds(guiEventListener.getX(), guiEventListener.getY(), 98, 20).build());
             }

@@ -1,6 +1,6 @@
 package ru.kelcu.windows.screens.components.alinlib;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import ru.kelcu.windows.Windows;
 import ru.kelcuprum.alinlib.gui.Colors;
@@ -13,9 +13,9 @@ public class EditBox extends ru.kelcuprum.alinlib.gui.components.editbox.EditBox
         this.setTextColor(0xFF000000);
         this.setTextShadow(false);
     }
-    public void renderText(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderText(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         String volume1 = font.plainSubstrByWidth(this.builder.secret ? Component.translatable("alinlib.editbox.secret").getString() : getValue(), getX() + getWidth() - (getPositionContent(this.builder.secret ? Component.translatable("alinlib.editbox.secret").getString() : getValue())));
-        guiGraphics.drawString(font,
+        guiGraphics.text(font,
                 //#if MC < 12110
                 //$$formatter.apply(volume1, displayPos)
                 //#else

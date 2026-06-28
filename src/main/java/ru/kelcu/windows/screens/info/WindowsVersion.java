@@ -1,7 +1,7 @@
 package ru.kelcu.windows.screens.info;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
@@ -32,16 +32,16 @@ public class WindowsVersion extends Screen {
     };
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         int x = 5, y = 5;
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("windows", "icon.png"), x, y, 0, 0, 50, 50, 50, 50);
         x = 60; y = 15;
-        guiGraphics.drawString(font, Component.translatable("minedows.winver.title"), x, y, WinColors.getTextColorWithMainColor(), false);
+        guiGraphics.text(font, Component.translatable("minedows.winver.title"), x, y, WinColors.getTextColorWithMainColor(), false);
         y+=font.lineHeight+3;
-        guiGraphics.drawString(font, Component.translatable("minedows.winver.name", FabricLoader.getInstance().getModContainer("minecraft").get().getMetadata().getVersion().getFriendlyString()), x, y, WinColors.getTextColorWithMainColor(), false);
+        guiGraphics.text(font, Component.translatable("minedows.winver.name", FabricLoader.getInstance().getModContainer("minecraft").get().getMetadata().getVersion().getFriendlyString()), x, y, WinColors.getTextColorWithMainColor(), false);
         y+=font.lineHeight+3;
-        guiGraphics.drawString(font, Component.translatable("minedows.winver.copyright"), x, y, WinColors.getTextColorWithMainColor(), false);
+        guiGraphics.text(font, Component.translatable("minedows.winver.copyright"), x, y, WinColors.getTextColorWithMainColor(), false);
         y+=font.lineHeight+3;
         y+=3;
         int[] colors = WinColors.getHorizontalRuleColors();
@@ -53,7 +53,7 @@ public class WindowsVersion extends Screen {
         texts.addAll(font.split(Component.translatable("minedows.winver.oneshot_startup_sound"), width-x-5));
         texts.addAll(font.split(Component.translatable("minedows.winver.clovi"), width-x-5));
         for(FormattedCharSequence formattedCharSequence : texts) {
-            guiGraphics.drawString(font, formattedCharSequence, x, y, WinColors.getTextColorWithMainColor(), false);
+            guiGraphics.text(font, formattedCharSequence, x, y, WinColors.getTextColorWithMainColor(), false);
             y += font.lineHeight + 3;
         }
         y+=3;
@@ -62,7 +62,7 @@ public class WindowsVersion extends Screen {
         y+=8;
         if(System.currentTimeMillis()-lastChange >= 5000) changePos();
         for(FormattedCharSequence formattedCharSequence : font.split(Component.translatable("minedows.winver.tester", testers[pos]), width-x-5)) {
-            guiGraphics.drawString(font, formattedCharSequence, x, y, WinColors.getTextColorWithMainColor(), false);
+            guiGraphics.text(font, formattedCharSequence, x, y, WinColors.getTextColorWithMainColor(), false);
             y += font.lineHeight + 3;
         }
     }
@@ -79,6 +79,6 @@ public class WindowsVersion extends Screen {
 
     @Override
     public void onClose() {
-        AlinLib.MINECRAFT.setScreen(null);
+        AlinLib.MINECRAFT.gui.setScreen(null);
     }
 }

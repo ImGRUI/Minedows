@@ -7,7 +7,7 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 //#endif
 import org.lwjgl.glfw.GLFW;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class Cursor {
     private static boolean isDragging;
 
@@ -16,7 +16,7 @@ public class Cursor {
     public static CursorType RESIZE_NWSE = CursorType.createStandardCursor(GLFW.GLFW_RESIZE_NWSE_CURSOR, "resize_nwse", CursorType.DEFAULT);
     //#endif
 
-    public static void setDragging(GuiGraphics guiGraphics) {
+    public static void setDragging(GuiGraphicsExtractor guiGraphics) {
         if (isDragging) return;
         isDragging = true;
         //#if MC < 12110
@@ -27,7 +27,7 @@ public class Cursor {
 
     }
 
-    public static void reset(GuiGraphics guiGraphics) {
+    public static void reset(GuiGraphicsExtractor guiGraphics) {
         if (!isDragging) return;
         isDragging = false;
         //#if MC < 12110

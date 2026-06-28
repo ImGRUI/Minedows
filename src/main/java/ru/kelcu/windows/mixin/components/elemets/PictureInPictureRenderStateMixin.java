@@ -1,6 +1,6 @@
 package ru.kelcu.windows.mixin.components.elemets;
 
-import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
+import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import ru.kelcu.windows.components.Window;
@@ -8,7 +8,7 @@ import ru.kelcu.windows.screens.DesktopScreen;
 
 @Mixin(GuiEntityRenderState.class)
 public abstract class PictureInPictureRenderStateMixin {
-    @ModifyVariable(method = "<init>(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Vector3f;Lorg/joml/Quaternionf;Lorg/joml/Quaternionf;IIIIFLnet/minecraft/client/gui/navigation/ScreenRectangle;)V", at = @At("HEAD"), index = 5, argsOnly = true)
+    @ModifyVariable(method = "<init>(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Vector3fc;Lorg/joml/Quaternionfc;Lorg/joml/Quaternionfc;IIIIFLnet/minecraft/client/gui/navigation/ScreenRectangle;)V", at = @At("HEAD"), index = 5, argsOnly = true)
     private static int x0(int value){
         if(DesktopScreen.currentRenderedWindow != null){
             Window window = DesktopScreen.currentRenderedWindow;
@@ -16,7 +16,7 @@ public abstract class PictureInPictureRenderStateMixin {
         }
         return value;
     }
-    @ModifyVariable(method = "<init>(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Vector3f;Lorg/joml/Quaternionf;Lorg/joml/Quaternionf;IIIIFLnet/minecraft/client/gui/navigation/ScreenRectangle;)V", at = @At("HEAD"), index = 6, argsOnly = true)
+    @ModifyVariable(method = "<init>(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Vector3fc;Lorg/joml/Quaternionfc;Lorg/joml/Quaternionfc;IIIIFLnet/minecraft/client/gui/navigation/ScreenRectangle;)V", at = @At("HEAD"), index = 6, argsOnly = true)
     private static int y0(int value){
         if(DesktopScreen.currentRenderedWindow != null){
             Window window = DesktopScreen.currentRenderedWindow;
@@ -24,7 +24,7 @@ public abstract class PictureInPictureRenderStateMixin {
         }
         return value;
     }
-    @ModifyVariable(method = "<init>(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Vector3f;Lorg/joml/Quaternionf;Lorg/joml/Quaternionf;IIIIFLnet/minecraft/client/gui/navigation/ScreenRectangle;)V", at = @At("HEAD"), index = 7, argsOnly = true)
+    @ModifyVariable(method = "<init>(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Vector3fc;Lorg/joml/Quaternionfc;Lorg/joml/Quaternionfc;IIIIFLnet/minecraft/client/gui/navigation/ScreenRectangle;)V", at = @At("HEAD"), index = 7, argsOnly = true)
     private static int x1(int value){
         if(DesktopScreen.currentRenderedWindow != null){
             Window window = DesktopScreen.currentRenderedWindow;
@@ -32,7 +32,7 @@ public abstract class PictureInPictureRenderStateMixin {
         }
         return value;
     }
-    @ModifyVariable(method = "<init>(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Vector3f;Lorg/joml/Quaternionf;Lorg/joml/Quaternionf;IIIIFLnet/minecraft/client/gui/navigation/ScreenRectangle;)V", at = @At("HEAD"), index = 8, argsOnly = true)
+    @ModifyVariable(method = "<init>(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Vector3fc;Lorg/joml/Quaternionfc;Lorg/joml/Quaternionfc;IIIIFLnet/minecraft/client/gui/navigation/ScreenRectangle;)V", at = @At("HEAD"), index = 8, argsOnly = true)
     private static int y1(int value){
         if(DesktopScreen.currentRenderedWindow != null){
             Window window = DesktopScreen.currentRenderedWindow;

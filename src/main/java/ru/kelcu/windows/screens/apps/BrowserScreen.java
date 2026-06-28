@@ -6,9 +6,8 @@ import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.TextureFormat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 //#if MC >= 12110
 import net.minecraft.client.input.CharacterEvent;
@@ -18,7 +17,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import ru.kelcu.windows.Windows;
@@ -43,71 +42,7 @@ public class BrowserScreen extends Screen {
     public MCEFBrowser browser;
     public String titleTab = "";
     public String tooltipHell = "";
-    protected ResourceLocation exampleLocation;
-    protected ExampleTexture exampleTexture;
-
-    public static class ExampleTexture extends AbstractTexture {
-        protected final ExampleGlTexture glTexture;
-
-        public ExampleTexture(int id, @NotNull String label) {
-            this.glTexture = new ExampleGlTexture(5, label, TextureFormat.RGBA8, 100, 100, 1, 1, id);
-            this.glTexture.setTextureFilter(FilterMode.NEAREST, false);
-            this.texture = this.glTexture;
-            GpuDevice device = RenderSystem.getDevice();
-            this.textureView = device.createTextureView(this.texture);
-        }
-
-        public void setId(int id) {
-            this.glTexture.setGlId(id);
-        }
-
-        public void setWidth(int width) {
-            this.glTexture.setWidth(width);
-        }
-
-        public void setHeight(int height) {
-            this.glTexture.setHeight(height);
-        }
-
-    }
-    public static class ExampleGlTexture extends GlTexture {
-
-        protected int width;
-        protected int height;
-        public ExampleGlTexture(int usage, String label, TextureFormat texFormat, int width, int height, int depthOrLayers, int mipLevels, int glId) {
-            super(usage, label, texFormat, width, height, depthOrLayers, mipLevels, glId);
-            this.width = width;
-            this.height = height;
-        }
-
-        @Override
-        public int getWidth(int i) {
-            return this.width >> i;
-        }
-
-        public void setWidth(int width) {
-            this.width = width;
-        }
-
-        @Override
-        public int getHeight(int i) {
-            return this.height >> i;
-        }
-
-        public void setHeight(int height) {
-            this.height = height;
-        }
-
-        @Override
-        public int glId() {
-            return this.id;
-        }
-
-        public void setGlId(int id) {
-            ((ExampleTextureMixin) this).setId(id);
-        }
-
-    }
+    protected Identifier exampleLocation;
     public static boolean isFirstHuy = true;
 
     public BrowserScreen() {
@@ -125,13 +60,11 @@ public class BrowserScreen extends Screen {
     protected void init() {
         super.init();
         if (browser == null) {
-            exampleLocation = ResourceLocation.fromNamespaceAndPath("example", "frame_" + UUID.randomUUID().toString().replace("-", ""));
-            exampleTexture = new ExampleTexture(-1, this.exampleLocation.toString());
+            exampleLocation = Identifier.fromNamespaceAndPath("example", "frame_" + UUID.randomUUID().toString().replace("-", ""));
             String url = Windows.config.getString("BROWSER.HOME_PAGE", "https://www.google.com");
             boolean transparent = false;
             browser = MCEF.createBrowser(url, transparent);
             resizeBrowser();
-            Minecraft.getInstance().getTextureManager().register(this.exampleLocation, this.exampleTexture);
         }
         int x = 0;
         int y = 0;
@@ -175,14 +108,12 @@ public class BrowserScreen extends Screen {
     }
 
     private void updateFrame() {
-        this.exampleTexture.setId(this.browser.getRenderer().getTextureID());
-        this.exampleTexture.setWidth(this.width);
-        this.exampleTexture.setHeight(this.height);
+//        this.browser.resize();
     }
 
     @Override
-    public void resize(Minecraft minecraft, int i, int j) {
-        super.resize(minecraft, i, j);
+    public void resize(int i, int j) {
+        super.resize(i, j);
         resizeBrowser();
     }
 
@@ -205,13 +136,13 @@ public class BrowserScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         this.updateFrame();
         WindowUtils.welcomeToWhiteSpace(guiGraphics, 0, BROWSER_DRAW_TITLE_OFFSET, width, height-BROWSER_DRAW_TITLE_OFFSET);
         guiGraphics.blit(
                 RenderPipelines.GUI_TEXTURED,
-                this.exampleLocation,
+                browser.getTextureIdentifier(),
                 BROWSER_DRAW_OFFSET, BROWSER_DRAW_OFFSET+BROWSER_DRAW_TITLE_OFFSET,
                 0, 0,
                 width - BROWSER_DRAW_OFFSET * 2, height - BROWSER_DRAW_TITLE_OFFSET - BROWSER_DRAW_OFFSET * 2,
@@ -382,7 +313,7 @@ public class BrowserScreen extends Screen {
             //#else
             CharacterEvent characterEvent) {
         char codePoint = characterEvent.codepointAsString().charAt(0);
-        int modifiers = characterEvent.modifiers();
+//        int modifiers = characterEvent.codepoint();
         //#endif
 
         if(editBox.isFocused()) return super.charTyped(
@@ -393,7 +324,7 @@ public class BrowserScreen extends Screen {
                 //#endif
         );
         if (codePoint == (char) 0) return false;
-        browser.sendKeyTyped(codePoint, modifiers);
+        browser.sendKeyTyped(codePoint, 0);
         browser.setFocus(true);
         return super.charTyped(
                 //#if MC < 12110

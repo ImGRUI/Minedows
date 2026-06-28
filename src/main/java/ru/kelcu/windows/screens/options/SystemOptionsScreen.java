@@ -1,6 +1,6 @@
 package ru.kelcu.windows.screens.options;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -115,16 +115,16 @@ public class SystemOptionsScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.enableScissor(1, 1, width-1, height-1);
-        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.render(guiGraphics, i, j, f);
+        if (scroller != null) for (AbstractWidget widget : scroller.widgets) widget.extractRenderState(guiGraphics, i, j, f);
         guiGraphics.disableScissor();
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+        super.extractBackground(guiGraphics, i, j, f);
         WindowUtils.welcomeToWhiteSpace(guiGraphics, 0, 0, width, height);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, builder.textureIcon == null ? GuiUtils.getResourceLocation("windows", "textures/options/background.png") : builder.textureIcon, 1, 1, 0, 0, 100, 150, 100, 150);
         int fruik =90;
@@ -133,7 +133,7 @@ public class SystemOptionsScreen extends Screen {
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GuiUtils.getResourceLocation("windows", "textures/start/icons/options.png"), x, y, 0, 0, 35, 35, 35, 35);
         y+=45;
         for(FormattedCharSequence formattedCharSequence : font.split(Component.empty().append(getTitle()).withStyle(Style.EMPTY.withBold(true)), fruik)){
-            guiGraphics.drawString(font, formattedCharSequence, x, y, 0xFF000000, false);
+            guiGraphics.text(font, formattedCharSequence, x, y, 0xFF000000, false);
             y += font.lineHeight + 3;
         }
         y+=5;
@@ -150,7 +150,7 @@ public class SystemOptionsScreen extends Screen {
         y+=15;
         Component description = builder.description != null ? builder.description : Component.translatable(builder.widgets.isEmpty() ? "minedows.control.description.empty" : "minedows.control.description");
         for(FormattedCharSequence formattedCharSequence : font.split(description, fruik)){
-            guiGraphics.drawString(font, formattedCharSequence, x, y, 0xFF000000, false);
+            guiGraphics.text(font, formattedCharSequence, x, y, 0xFF000000, false);
             y += font.lineHeight + 3;
         }
     }
