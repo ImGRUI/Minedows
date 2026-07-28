@@ -90,7 +90,7 @@ public class Windows implements ClientModInitializer {
             gameStarted = true;
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath("windows", "windows_startup")), 1.0F));
             perlinNoises = new Thread(() -> {
-                while(true) {
+                while (gameStarted) {
                         try {
                             if(config.getNumber("WALLPAPER.TYPE", 0).intValue() == 1 && AlinLib.MINECRAFT.level == null) {
                                 generatePerlin(AlinLib.MINECRAFT.gui.screen().width / 2, AlinLib.MINECRAFT.gui.screen().height / 2);
@@ -114,7 +114,7 @@ public class Windows implements ClientModInitializer {
                 }
             }
         });
-        ClientLifecycleEvents.CLIENT_STOPPING.register((s) -> {if(perlinNoises != null) perlinNoises.interrupt();});
+        ClientLifecycleEvents.CLIENT_STOPPING.register((s) -> gameStarted = false);
         OverlayHandler hud = new OverlayHandler();
         ScreenEvents.SCREEN_RENDER.register(hud);
         GuiRenderEvents.RENDER.register(hud);
